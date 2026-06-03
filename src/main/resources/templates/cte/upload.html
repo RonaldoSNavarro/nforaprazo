@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments/layout :: head('Upload CT-e')}">
+    <title>Upload CT-e</title>
+</head>
+<body class="font-body bg-slate-950 min-h-screen">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="min-h-screen transition-all duration-300" id="main-content">
+        <div th:replace="~{fragments/layout :: topbar}"></div>
+
+        <main class="p-6 lg:p-8">
+            <div class="mb-8">
+                <h1 class="font-display text-2xl font-bold text-slate-50">Upload de CT-e Complementar</h1>
+                <p class="text-slate-400 mt-1">Envie o arquivo PDF original do conhecimento de transporte.</p>
+            </div>
+
+            <!-- Alertas -->
+            <div th:if="${erro}" class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 flex items-start gap-3">
+                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span th:text="${erro}">Mensagem de erro aqui</span>
+            </div>
+
+            <div class="max-w-2xl bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-xl shadow-black/20">
+                <div class="p-6">
+                    <form th:action="@{/cte/upload}" method="post" enctype="multipart/form-data" id="uploadForm">
+                        
+                        <!-- Drag & Drop Area -->
+                        <div class="w-full relative group">
+                            <label for="arquivoCte" class="flex flex-col items-center justify-center w-full h-64 border-2 border-slate-600 border-dashed rounded-xl cursor-pointer bg-slate-900/50 hover:bg-slate-800 hover:border-amber-500/50 transition-all">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <div class="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                        </svg>
+                                    </div>
+                                    <p class="mb-2 text-sm text-slate-300"><span class="font-semibold text-amber-500">Clique para selecionar</span> ou arraste o PDF</p>
+                                    <p class="text-xs text-slate-500">Apenas arquivos .PDF (Max. 10MB)</p>
+                                </div>
+                                <input id="arquivoCte" name="arquivoCte" type="file" class="hidden" accept=".pdf" required onchange="updateFileName(this)" />
+                            </label>
+                        </div>
+                        
+                        <!-- File Info Display -->
+                        <div id="fileInfo" class="hidden mt-4 p-4 rounded-xl bg-slate-900/50 border border-slate-700 flex items-center gap-3">
+                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                            <div class="flex-1 min-w-0">
+                                <p id="fileNameDisplay" class="text-sm font-medium text-slate-200 truncate">arquivo.pdf</p>
+                                <p class="text-xs text-slate-500">Pronto para upload</p>
+                            </div>
+                        </div>
+
+                        <!-- Submit Section -->
+                        <div class="mt-8 flex items-center justify-between border-t border-slate-700 pt-6">
+                            <p class="text-xs text-slate-400">A integridade do arquivo sera validada no servidor.</p>
+                            <button type="submit" id="submitBtn" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                Fazer Upload
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+    <script>
+        function updateFileName(input) {
+            const display = document.getElementById('fileInfo');
+            const name = document.getElementById('fileNameDisplay');
+            const btn = document.getElementById('submitBtn');
+            
+            if (input.files && input.files[0]) {
+                name.textContent = input.files[0].name;
+                display.classList.remove('hidden');
+            } else {
+                display.classList.add('hidden');
+            }
+        }
+        
+        // Form submit handler to disable button
+        document.getElementById('uploadForm').addEventListener('submit', function() {
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-slate-950 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Enviando...';
+            btn.disabled = true;
+        });
+    </script>
+</body>
+</html>

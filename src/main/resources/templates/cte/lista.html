@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments/layout :: head('Listagem de CT-es')}">
+    <title>Lista de CT-es</title>
+</head>
+<body class="font-body bg-slate-950 min-h-screen">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="min-h-screen transition-all duration-300" id="main-content">
+        <div th:replace="~{fragments/layout :: topbar}"></div>
+
+        <main class="p-6 lg:p-8">
+            <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="font-display text-2xl font-bold text-slate-50">Base de CT-es Complementares</h1>
+                    <p class="text-slate-400 mt-1">Gerencie todos os conhecimentos de transporte anexados no sistema.</p>
+                </div>
+            </div>
+
+            <!-- Alertas -->
+            <div th:if="${sucesso}" class="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 flex items-start gap-3">
+                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span th:text="${sucesso}">Sucesso</span>
+            </div>
+
+            <!-- Tabela -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-xl shadow-black/20">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-slate-300">
+                        <thead class="text-xs text-slate-400 uppercase bg-slate-900/50 border-b border-slate-700">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Chave de Acesso</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Arquivo Físico</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Data Upload</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sem resultados -->
+                            <tr th:if="${ctes.empty}" class="bg-slate-800 border-b border-slate-700/50">
+                                <td colspan="4" class="px-6 py-8 text-center text-slate-500">Nenhum CT-e registrado no sistema.</td>
+                            </tr>
+                            
+                            <!-- Resultados -->
+                            <tr th:each="cte : ${ctes.content}" class="bg-slate-800 border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-200">
+                                    <span th:if="${cte.chaveAcesso}" th:text="${cte.chaveAcesso}">0000...</span>
+                                    <span th:unless="${cte.chaveAcesso}" class="text-slate-500 italic">Nao extraída</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border"
+                                          th:classappend="${
+                                            cte.status.name() == 'PENDENTE_DESCARGA' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                            (cte.status.name() == 'DESEMBARACADO' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                                            (cte.status.name() == 'AUTUADO' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'))
+                                          }"
+                                          th:text="${cte.status}">
+                                        STATUS
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-400">
+                                    <span th:text="${cte.nomeOriginalArquivo}">arquivo.pdf</span>
+                                    <p class="text-xs text-slate-500 font-mono mt-1" th:text="${cte.arquivoPdfPath}">UUID</p>
+                                </td>
+                                <td class="px-6 py-4" th:text="${#temporals.format(cte.dataUpload, 'dd/MM/yyyy HH:mm')}">
+                                    01/01/2026
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginacao -->
+                <div th:if="${ctes.totalPages > 1}" class="p-4 border-t border-slate-700 flex items-center justify-between bg-slate-900/30">
+                    <span class="text-sm text-slate-400">
+                        Página <span class="font-semibold text-slate-300" th:text="${ctes.number + 1}">1</span> de <span class="font-semibold text-slate-300" th:text="${ctes.totalPages}">10</span>
+                    </span>
+                    <div class="inline-flex rounded-lg shadow-sm">
+                        <a th:if="${ctes.hasPrevious()}" th:href="@{/cte/lista(page=${ctes.number - 1})}" class="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-800 border border-slate-600 rounded-l-lg hover:bg-slate-700 hover:text-white transition-colors">Anterior</a>
+                        <a th:if="${ctes.hasNext()}" th:href="@{/cte/lista(page=${ctes.number + 1})}" class="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-800 border border-slate-600 rounded-r-lg hover:bg-slate-700 hover:text-white transition-colors">Próxima</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
