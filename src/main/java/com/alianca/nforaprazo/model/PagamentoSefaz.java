@@ -36,6 +36,9 @@ public class PagamentoSefaz {
     @Column(name = "path_comprovante_pdf", nullable = false, length = 255)
     private String pathComprovantePdf;
 
+    @Column(name = "path_auto_infracao_pdf", nullable = false, length = 255)
+    private String pathAutoInfracaoPdf;
+
     @Column(name = "path_capa_pdf", length = 255)
     private String pathCapaPdf;
 

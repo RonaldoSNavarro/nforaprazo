@@ -58,11 +58,12 @@ public class DescargaController {
                                      @RequestParam("dataPagamento") LocalDate dataPagamento,
                                      @RequestParam("darPdf") MultipartFile darPdf,
                                      @RequestParam("comprovantePdf") MultipartFile comprovantePdf,
+                                     @RequestParam("autoInfracaoPdf") MultipartFile autoInfracaoPdf,
                                      @RequestParam(value = "capaPdf", required = false) MultipartFile capaPdf,
                                      Authentication authentication,
                                      RedirectAttributes redirectAttributes) {
         try {
-            descargaService.registrarPagamento(cteId, valorMulta, dataPagamento, darPdf, comprovantePdf, capaPdf, authentication.getName());
+            descargaService.registrarPagamento(cteId, valorMulta, dataPagamento, darPdf, comprovantePdf, autoInfracaoPdf, capaPdf, authentication.getName());
             redirectAttributes.addFlashAttribute("sucesso", "Pagamento SEFAZ registrado e CT-e desembaraçado com sucesso!");
             return "redirect:/descarga/pendentes";
         } catch (Exception e) {

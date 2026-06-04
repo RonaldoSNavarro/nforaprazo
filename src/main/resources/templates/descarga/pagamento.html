@@ -44,7 +44,7 @@
                 <div class="space-y-6">
                     <h3 class="text-lg font-semibold text-slate-200 border-b border-slate-700 pb-2">Documentação Fiscal</h3>
                     
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- DAR -->
                         <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-700">
                             <label class="block text-sm font-medium text-slate-300 mb-1">DAR (Guia) *</label>
@@ -57,6 +57,13 @@
                             <label class="block text-sm font-medium text-slate-300 mb-1">Comprovante de Pgto *</label>
                             <p class="text-xs text-slate-500 mb-3">Comprovante bancário</p>
                             <input type="file" name="comprovantePdf" accept=".pdf" required class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500/10 file:text-amber-500 hover:file:bg-amber-500/20" />
+                        </div>
+
+                        <!-- Auto de Infração (TAX) -->
+                        <div class="bg-slate-900/50 p-4 rounded-xl border border-orange-700/40">
+                            <label class="block text-sm font-medium text-orange-300 mb-1">Auto de Infração (TAX) *</label>
+                            <p class="text-xs text-slate-500 mb-3">Documento disponibilizado pela equipe TAX</p>
+                            <input type="file" name="autoInfracaoPdf" accept=".pdf" required class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-500/10 file:text-orange-400 hover:file:bg-orange-500/20" />
                         </div>
 
                         <!-- Capa (Opcional) -->

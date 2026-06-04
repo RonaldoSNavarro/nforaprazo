@@ -30,7 +30,8 @@ public class DescargaService {
     @Transactional
     public PagamentoSefaz registrarPagamento(
             UUID cteId, BigDecimal valorMulta, LocalDate dataPagamento,
-            MultipartFile darPdf, MultipartFile comprovantePdf, MultipartFile capaPdf,
+            MultipartFile darPdf, MultipartFile comprovantePdf,
+            MultipartFile autoInfracaoPdf, MultipartFile capaPdf,
             String emailUsuario) {
         
         log.info("Iniciando registro de pagamento para CT-e: {}", cteId);
@@ -49,6 +50,7 @@ public class DescargaService {
         // 1. Salvar os arquivos isoladamente
         String darPath = storageService.store(darPdf);
         String comprovantePath = storageService.store(comprovantePdf);
+        String autoInfracaoPath = storageService.store(autoInfracaoPdf);
         String capaPath = (capaPdf != null && !capaPdf.isEmpty()) ? storageService.store(capaPdf) : null;
 
         // 2. Criar a entidade de pagamento vinculada
@@ -58,6 +60,7 @@ public class DescargaService {
                 .dataPagamento(dataPagamento)
                 .pathDarPdf(darPath)
                 .pathComprovantePdf(comprovantePath)
+                .pathAutoInfracaoPdf(autoInfracaoPath)
                 .pathCapaPdf(capaPath)
                 .usuarioRegistro(usuario)
                 .build();
