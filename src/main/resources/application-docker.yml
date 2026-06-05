@@ -1,0 +1,9 @@
+# Profile Docker - sobrescreve application.yml quando SPRING_PROFILES_ACTIVE=docker
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://host.docker.internal:5432/nfora_prazo_dev}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:dev}
+
+file:
+  upload-dir: ${FILE_UPLOAD_DIR:/app/uploads}

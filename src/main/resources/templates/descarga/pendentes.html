@@ -72,15 +72,22 @@
                                         Anexar Auto Infração
                                     </button>
 
+                                    <!-- Ação 2.5: Encerrar Sem Auto -->
+                                    <button th:if="${cte.status.name() == 'DESEMBARACADO'}" 
+                                            th:attr="onclick=|openSemAutoModal('${cte.id}', '${cte.chaveAcesso}', '${#numbers.formatDecimal(cte.getValorPotencialMulta(), 1, 'POINT', 2, 'COMMA')}')|"
+                                            class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-emerald-900/20 ml-2">
+                                        Encerrar Sem Auto
+                                    </button>
+
                                     <!-- Ação 3: Anexar DAR -->
-                                    <button th:if="${cte.status.name() == 'AUTO_RECEBIDO'}" 
+                                    <button th:if="${cte.status.name() == 'AGUARDANDO_PAGAMENTO' and (cte.autoInfracao == null or cte.autoInfracao.pagamento == null or cte.autoInfracao.pagamento.pathDarPdf == null)}" 
                                             th:attr="onclick=|openModal('modalDar', '${cte.id}')|"
                                             class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-purple-900/20">
                                         Gerar/Anexar DAR
                                     </button>
 
                                     <!-- Ação 4: Comprovante de Pagamento -->
-                                    <button th:if="${cte.status.name() == 'AGUARDANDO_PAGAMENTO'}" 
+                                    <button th:if="${cte.status.name() == 'AGUARDANDO_PAGAMENTO' and cte.autoInfracao != null and cte.autoInfracao.pagamento != null and cte.autoInfracao.pagamento.pathDarPdf != null}" 
                                             th:attr="onclick=|openModal('modalComprovante', '${cte.id}')|"
                                             class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-green-900/20">
                                         Confirmar Pagamento
@@ -184,6 +191,30 @@
         </div>
     </div>
 
+    <!-- Modal 5: Encerrar Sem Auto -->
+    <div id="modalSemAuto" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <h3 class="text-lg font-bold text-slate-50 mb-2">Encerrar Processo Sem Auto</h3>
+            <p class="text-xs text-slate-400 mb-4 font-mono break-all" id="modalSemAuto_chaveLabel">Chave: -</p>
+            <div class="mb-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                <span class="text-xs uppercase font-semibold">Multa Evitada (Potencial):</span>
+                <p class="text-lg font-bold" id="modalSemAuto_valorPotencial">R$ 0,00</p>
+            </div>
+            <form th:action="@{/descarga/encerrar-sem-auto}" method="post">
+                <input type="hidden" name="cteId" id="modalSemAuto_cteId">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Justificativa da Ação (Evitação) *</label>
+                    <textarea name="justificativa" id="justificativa" required minlength="15" placeholder="Descreva por que o auto de infração foi evitado (ex: erro revertido, navio não atracado...)" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"></textarea>
+                    <p class="text-right text-xs text-slate-500 mt-1" id="semAutoCounter">Mínimo 15 caracteres</p>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('modalSemAuto')" class="px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg transition-colors">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors">Confirmar Fechamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         function openModal(modalId, cteId) {
             document.getElementById(modalId).classList.remove('hidden');
@@ -191,6 +222,28 @@
         }
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
+        }
+        function openSemAutoModal(cteId, chaveAcesso, valorPotencial) {
+            document.getElementById('modalSemAuto').classList.remove('hidden');
+            document.getElementById('modalSemAuto_cteId').value = cteId;
+            document.getElementById('modalSemAuto_chaveLabel').textContent = "Chave: " + (chaveAcesso ? chaveAcesso : "S/N");
+            document.getElementById('modalSemAuto_valorPotencial').textContent = "R$ " + valorPotencial;
+        }
+
+        // Real-time justification counter
+        const justArea = document.getElementById('justificativa');
+        const justCounter = document.getElementById('semAutoCounter');
+        if (justArea && justCounter) {
+            justArea.addEventListener('input', () => {
+                const len = justArea.value.length;
+                if (len < 15) {
+                    justCounter.textContent = `Faltam ${15 - len} caracteres (Mínimo: 15)`;
+                    justCounter.className = 'text-right text-xs text-red-400 mt-1';
+                } else {
+                    justCounter.textContent = `${len} caracteres digitados`;
+                    justCounter.className = 'text-right text-xs text-green-400 mt-1';
+                }
+            });
         }
     </script>
     <div th:replace="~{fragments/layout :: scripts}"></div>

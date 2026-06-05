@@ -1,8 +1,10 @@
 package com.alianca.nforaprazo.controller;
 
+import com.alianca.nforaprazo.dto.CteUploadRequest;
 import com.alianca.nforaprazo.model.Cte;
 import com.alianca.nforaprazo.service.CteService;
 import com.alianca.nforaprazo.repository.CteRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -11,8 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -25,18 +27,35 @@ public class CteController {
     private final CteRepository cteRepository;
 
     @GetMapping("/upload")
-    public String exibirFormUpload() {
+    public String exibirFormUpload(Model model) {
+        model.addAttribute("cteUploadRequest", new CteUploadRequest());
         return "cte/upload";
     }
 
     @PostMapping("/upload")
-    public String processarUpload(@RequestParam("arquivoCte") MultipartFile file,
+    public String processarUpload(@Valid @ModelAttribute CteUploadRequest request,
+                                  BindingResult bindingResult,
                                   Authentication authentication,
                                   RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            String erroMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            redirectAttributes.addFlashAttribute("erro", "Erro de validação: " + erroMsg);
+            return "redirect:/cte/upload";
+        }
+
         try {
-            Cte cteSalvo = cteService.processarUploadCte(file, authentication.getName());
-            redirectAttributes.addFlashAttribute("sucesso", "CT-e importado com sucesso! " + 
-                (cteSalvo.getChaveAcesso() != null ? "Chave: " + cteSalvo.getChaveAcesso() : "Aviso: Chave nao extraída automaticamente."));
+            Cte cteSalvo = cteService.processarUploadCte(request, authentication.getName());
+            
+            String msg = "CT-e importado com sucesso!";
+            if (cteSalvo.getChaveAcesso() != null) {
+                msg += " Chave: " + cteSalvo.getChaveAcesso();
+            } else {
+                msg += " Aviso: Chave não extraída automaticamente.";
+            }
+            if (cteSalvo.isPortoMonitorado()) {
+                msg += " Alerta enviado para equipe DESCARGA.";
+            }
+            redirectAttributes.addFlashAttribute("sucesso", msg);
             return "redirect:/cte/lista";
         } catch (Exception e) {
             log.error("Erro no upload", e);

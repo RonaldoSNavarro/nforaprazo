@@ -1,9 +1,11 @@
 package com.alianca.nforaprazo.controller;
 
+import com.alianca.nforaprazo.dto.*;
 import com.alianca.nforaprazo.model.Cte;
 import com.alianca.nforaprazo.model.enums.StatusCte;
 import com.alianca.nforaprazo.repository.CteRepository;
 import com.alianca.nforaprazo.service.DescargaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -12,12 +14,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -32,10 +33,11 @@ public class DescargaController {
     @GetMapping("/pendentes")
     public String listarPendentes(@RequestParam(defaultValue = "0") int page, Model model) {
         Page<Cte> pendentes = cteRepository.findByStatusIn(
-                java.util.List.of(
+                List.of(
                         StatusCte.AGUARDANDO_DESEMBARACO,
                         StatusCte.DESEMBARACADO,
                         StatusCte.AUTO_RECEBIDO,
+                        StatusCte.EM_INVESTIGACAO,
                         StatusCte.AGUARDANDO_PAGAMENTO
                 ), 
                 PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "dataUpload")));
@@ -57,10 +59,18 @@ public class DescargaController {
     }
 
     @PostMapping("/auto-infracao")
-    public String registrarAutoInfracao(@RequestParam("cteId") UUID cteId, @RequestParam("autoInfracaoPdf") MultipartFile autoInfracaoPdf, Authentication authentication, RedirectAttributes redirectAttributes) {
+    public String registrarAutoInfracao(@Valid @ModelAttribute AutoInfracaoRequest request,
+                                        BindingResult bindingResult,
+                                        Authentication authentication,
+                                        RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            String erroMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            redirectAttributes.addFlashAttribute("erro", "Erro de validação: " + erroMsg);
+            return "redirect:/descarga/pendentes";
+        }
         try {
-            descargaService.registrarAutoInfracao(cteId, autoInfracaoPdf, authentication.getName());
-            redirectAttributes.addFlashAttribute("sucesso", "Auto de Infração registrado!");
+            descargaService.registrarAutoInfracao(request, authentication.getName());
+            redirectAttributes.addFlashAttribute("sucesso", "Auto de Infração registrado com sucesso!");
         } catch (Exception e) {
             log.error("Erro", e);
             redirectAttributes.addFlashAttribute("erro", "Erro: " + e.getMessage());
@@ -69,9 +79,17 @@ public class DescargaController {
     }
 
     @PostMapping("/dar")
-    public String registrarDar(@RequestParam("cteId") UUID cteId, @RequestParam("darPdf") MultipartFile darPdf, Authentication authentication, RedirectAttributes redirectAttributes) {
+    public String registrarDar(@Valid @ModelAttribute DarRequest request,
+                               BindingResult bindingResult,
+                               Authentication authentication,
+                               RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            String erroMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            redirectAttributes.addFlashAttribute("erro", "Erro de validação: " + erroMsg);
+            return "redirect:/descarga/pendentes";
+        }
         try {
-            descargaService.registrarDar(cteId, darPdf, authentication.getName());
+            descargaService.registrarDar(request, authentication.getName());
             redirectAttributes.addFlashAttribute("sucesso", "DAR registrado com sucesso!");
         } catch (Exception e) {
             log.error("Erro", e);
@@ -81,18 +99,40 @@ public class DescargaController {
     }
 
     @PostMapping("/comprovante")
-    public String registrarComprovante(@RequestParam("cteId") UUID cteId, 
-                                       @RequestParam("valorPago") BigDecimal valorPago, 
-                                       @RequestParam("dataPagamento") LocalDate dataPagamento, 
-                                       @RequestParam("comprovantePdf") MultipartFile comprovantePdf, 
-                                       @RequestParam(value = "capaPdf", required = false) MultipartFile capaPdf, 
+    public String registrarComprovante(@Valid @ModelAttribute ComprovanteRequest request,
+                                       BindingResult bindingResult,
                                        Authentication authentication, 
                                        RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            String erroMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            redirectAttributes.addFlashAttribute("erro", "Erro de validação: " + erroMsg);
+            return "redirect:/descarga/pendentes";
+        }
         try {
-            descargaService.registrarComprovante(cteId, valorPago, dataPagamento, comprovantePdf, capaPdf, authentication.getName());
+            descargaService.registrarComprovante(request, authentication.getName());
             redirectAttributes.addFlashAttribute("sucesso", "Comprovante registrado e pagamento finalizado!");
         } catch (Exception e) {
             log.error("Erro", e);
+            redirectAttributes.addFlashAttribute("erro", "Erro: " + e.getMessage());
+        }
+        return "redirect:/descarga/pendentes";
+    }
+
+    @PostMapping("/encerrar-sem-auto")
+    public String encerrarSemAuto(@Valid @ModelAttribute EncSemAutoRequest request,
+                                  BindingResult bindingResult,
+                                  Authentication authentication,
+                                  RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            String erroMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            redirectAttributes.addFlashAttribute("erro", "Erro de validação: " + erroMsg);
+            return "redirect:/descarga/pendentes";
+        }
+        try {
+            descargaService.encerrarSemAuto(request, authentication.getName());
+            redirectAttributes.addFlashAttribute("sucesso", "Processo encerrado sem auto de infração com sucesso!");
+        } catch (Exception e) {
+            log.error("Erro ao encerrar sem auto para CT-e {}", request.getCteId(), e);
             redirectAttributes.addFlashAttribute("erro", "Erro: " + e.getMessage());
         }
         return "redirect:/descarga/pendentes";

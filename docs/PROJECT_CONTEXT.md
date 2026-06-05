@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md — Sistema NF Fora do Prazo
-> Status: 🟡 EM ANDAMENTO
-> Fase atual: **FASE 2 — Desembaraço/Pagamento concluída, aguardando validação**
-> Última atualização: 2026-06-04 | Atualizado por: PM Agent
+> Status: 🟢 FASE 4 CONCLUÍDA
+> Fase atual: **FASE 5 — Dashboard (iniciando)**
+> Última atualização: 2026-06-05 | Atualizado por: CTO Agent
 > Para requisitos detalhados, consulte: REQUIREMENTS.md
  
 ---
@@ -39,14 +39,16 @@ com.alianca.nforaprazo
 
 ## 3. TIME DE AGENTES
  
-| Agente         | Modelo                | Responsabilidade |
-|----------------|-----------------------|------------------|
-| CTO            | Claude Opus 4.6       | Arquitetura, ADRs, sign-off de fase |
-| Dev Sênior     | Gemini 2.5 Pro        | Implementação Spring Boot/Thymeleaf |
-| Code Review    | Gemini 2.5 Pro (high) | Revisão técnica antes do QA |
-| UI/UX Designer | Gemini 2.5 Flash      | Templates HTML/Tailwind |
-| QA             | Gemini 2.5 Pro (high) | Testes, bug reports, sign-off QA |
-| PM             | Gemini 2.5 Flash      | Documentação, atualização deste arquivo |
+| Agente                      | Modelo                  | Responsabilidade                                        |
+|-----------------------------|-------------------------|---------------------------------------------------------|
+| CTO                         | Claude Opus 4.6         | Arquitetura, ADRs, sign-off de fase                     |
+| Dev Sênior                  | Gemini 3.1 Pro          | Implementação Spring Boot/Thymeleaf                     |
+| Code Review                 | Gemini 3.5 flash (high) | Revisão técnica antes do QA                             |
+| UI/UX Designer              | Gemini 3.5 Flash        | Templates HTML/Tailwind                                 |
+| QA                          | Gemini 3.5 flash (high) | Testes, bug reports, sign-off QA                        |
+| Analista de Sistemas Sênior | Gemini 3.5 flash (high) | Análise e levantamento de requisitos, regras de negócio |
+| Project Manager             | Gemini 3.5 Flash        | Documentação, atualização deste arquivo                 |
+
  
 ---
  
@@ -54,10 +56,10 @@ com.alianca.nforaprazo
  
 ```
 [🟢] Fase 0 — Fundação         (Semanas 1-2)   → CONCLUÍDA
-[🟢] Fase 1 — Upload CT-e      (Semanas 3-5)   → CONCLUÍDA (upload + extração PDFBox + listagem)
-[🟡] Fase 2 — Desembaraço/Pgto (Semanas 6-9)   → IMPLEMENTADA, EM VALIDAÇÃO
-[ ] Fase 3 — Auto de Infração  (Semanas 10-11) → não iniciada
-[ ] Fase 4 — Sem Auto + Nota   (Semanas 12-13) → não iniciada
+[🟢] Fase 1 — Upload CT-e      (Semanas 3-5)   → CONCLUÍDA
+[🟢] Fase 2 — Desembaraço/Pgto (Semanas 6-9)   → CONCLUÍDA (Refatorada para Máquina de Estados)
+[🟢] Fase 3 — Auto de Infração  (Semanas 10-11) → CONCLUÍDA (Investigação e Notificações)
+[🟢] Fase 4 — Sem Auto + Nota   (Semanas 12-13) → CONCLUÍDA (Faturamento e DTO Validation)
 [ ] Fase 5 — Dashboard         (Semanas 14-16) → não iniciada
 [ ] Fase 6 — Go-Live           (Semanas 17-18) → não iniciada
 ```
@@ -84,12 +86,29 @@ com.alianca.nforaprazo
 - [x] CteController.java — upload e listagem
 - [x] upload.html / lista.html — templates
 
-### Entregáveis da Fase 2 (EM VALIDAÇÃO)
+### Entregáveis da Fase 2 (CONCLUÍDA)
 - [x] V4__add_version_and_pagamento_table.sql — Optimistic Locking + pagamento_sefaz
 - [x] PagamentoSefaz.java — entidade 1:1 com Cte
 - [x] DescargaService.java — validação de status + upload triplo
 - [x] DescargaController.java — pendentes + formulário pagamento
 - [x] pendentes.html / pagamento.html — templates descarga
+
+### Entregáveis da Fase 3 (CONCLUÍDA)
+- [x] EmailService.java — envio assíncrono de alertas por e-mail + persistência de LogAlerta (RNF03)
+- [x] DocsFiscalService.java — lógica de investigação (responsável, motivo, ticket)
+- [x] DocsFiscalController.java — endpoints para iniciar/concluir investigação
+- [x] pendentes.html (docs-fiscal) — lista de investigações pendentes e modal de preenchimento
+- [x] @EnableAsync habilitado em NforaPrazoApplication.java
+
+### Entregáveis da Fase 4 (CONCLUÍDA)
+- [x] V12__create_nota_debito_and_enc_sem_auto.sql — migration para tabelas nota_debito e enc_sem_auto
+- [x] V13__fix_pago_responsibility_for_test.sql — migration para correção de dados legados inconsistentes
+- [x] EncSemAuto.java e NotaDebito.java — entidades JPA mapeadas
+- [x] Request DTOs com validação Bean Validation (Size, NotBlank, NotNull)
+- [x] FaturamentoService.java e FaturamentoController.java — fluxo de Notas de Débito e Absorção de Custos
+- [x] Refatoração completa dos controladores para recebimento e validação via `@Valid DTO`
+- [x] nota-debito.html — tela de faturamento / descarga/pendentes.html — modal de encerramento sem auto
+- [x] Correção de links quebrados nos painéis de cards de home.html e layout.html
  
 ---
  
@@ -131,7 +150,9 @@ Nomenclatura: Classes PascalCase PT-BR | Métodos camelCase PT-BR | Migrations V
 |------|---------------|-------------|
 | Fase 0 | 2026-06-02 | Autenticação, RBAC, layout base, migrations V1-V2 |
 | Fase 1 | 2026-06-02 | Upload CT-e, PDFBox, StorageService, listagem paginada |
-| Fase 2 | 2026-06-02 | Pagamento SEFAZ, Optimistic Locking, upload triplo |
+| Fase 2 | 2026-06-04 | Pagamento SEFAZ, Optimistic Locking, upload triplo, Máquina de Estados Refatorada |
+| Fase 3 | 2026-06-05 | Investigação DOCS_FISCAL, Notificações EmailService, Logs de Alertas |
+| Fase 4 | 2026-06-05 | Encerramento Sem Auto, Emissão de Notas de Débito, Validação Bean Validation com DTOs |
  
 ---
  
@@ -140,6 +161,7 @@ Nomenclatura: Classes PascalCase PT-BR | Métodos camelCase PT-BR | Migrations V
 | ID     | Status   | Descrição | Responsável |
 |--------|----------|-----------|-------------|
 | BUG-01 | RESOLVIDO | Links da sidebar DESCARGA apontavam para rotas inexistentes (/cte/pendentes) | Dev |
+| BUG-02 | RESOLVIDO | Restrição de check ck_cte_status no BD barrando novos status | QA/CTO |
  
 ---
  
@@ -147,19 +169,21 @@ Nomenclatura: Classes PascalCase PT-BR | Métodos camelCase PT-BR | Migrations V
  
 | Prioridade | Ação | Responsável |
 |------------|------|-------------|
-| Alta       | Validar fluxo completo Fase 2 após fix de links | QA |
-| Alta       | Implementar Fase 3 — Auto de Infração e Investigação | Dev |
-| Média      | Alinhar modelo de dados com REQUIREMENTS.md (StatusCte expandido) | CTO/Dev |
+| Alta       | Pesquisa de Requisitos da Fase 3 — Entrevista com equipe TAX | PM / Analista |
+| Alta       | Desenhar novo fluxo de UI para Perfil DOCS_FISCAL e GESTAO | UI/UX |
+| Média      | Modelagem da atribuição de multas (Cliente vs Aliança) na Entidade | Dev / CTO |
  
 ---
  
 ## 10. CONFIGURAÇÃO DE AMBIENTE
  
 ```yaml
-# Dev: application.yml
+# Dev: application.yml (rodando nativo)
 spring.datasource.url: jdbc:postgresql://localhost:5432/nfora_prazo_dev
-spring.mail.host: sandbox.smtp.mailtrap.io  ← usar Mailtrap em dev
- 
-# Variáveis de ambiente necessárias:
-DB_USER, DB_PASSWORD, MAIL_HOST, MAIL_PORT, MAIL_USER, MAIL_PASS, FILE_UPLOAD_DIR
+
+# Docker Compose: docker-compose.yml (acessando banco local da máquina host)
+spring.datasource.url: jdbc:postgresql://host.docker.internal:5432/nfora_prazo_dev
+
+# Variáveis de ambiente necessárias (.env ou variáveis do SO):
+SPRING_DATASOURCE_URL, DB_USER, DB_PASSWORD, MAIL_HOST, MAIL_PORT, MAIL_USER, MAIL_PASS, FILE_UPLOAD_DIR
 ```

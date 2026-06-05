@@ -50,6 +50,53 @@
                             </div>
                         </div>
 
+                        <!-- Dados do CT-e (Preenchimento Manual - ADR-001) -->
+                        <div class="mt-6 border-t border-slate-700 pt-6">
+                            <h3 class="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                Dados do CT-e
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="numeroCte" class="block text-xs font-medium text-slate-400 mb-1">Número do CT-e</label>
+                                    <input type="text" id="numeroCte" name="numeroCte" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all placeholder-slate-600" placeholder="Ex: 12345"/>
+                                </div>
+                                <div>
+                                    <label for="numeroBooking" class="block text-xs font-medium text-slate-400 mb-1">Nº Booking</label>
+                                    <input type="text" id="numeroBooking" name="numeroBooking" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all placeholder-slate-600" placeholder="Ex: BK20260001"/>
+                                </div>
+                                <div>
+                                    <label for="tomadorNome" class="block text-xs font-medium text-slate-400 mb-1">Tomador (Nome)</label>
+                                    <input type="text" id="tomadorNome" name="tomadorNome" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Razão social do tomador"/>
+                                </div>
+                                <div>
+                                    <label for="tomadorCnpj" class="block text-xs font-medium text-slate-400 mb-1">Tomador (CNPJ)</label>
+                                    <input type="text" id="tomadorCnpj" name="tomadorCnpj" maxlength="18" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="00.000.000/0001-00"/>
+                                </div>
+                                <div>
+                                    <label for="navio" class="block text-xs font-medium text-slate-400 mb-1">Navio</label>
+                                    <input type="text" id="navio" name="navio" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Nome do navio"/>
+                                </div>
+                                <div>
+                                    <label for="viagem" class="block text-xs font-medium text-slate-400 mb-1">Viagem</label>
+                                    <input type="text" id="viagem" name="viagem" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Código da viagem"/>
+                                </div>
+                                <div>
+                                    <label for="portoOrigem" class="block text-xs font-medium text-slate-400 mb-1">Porto de Origem</label>
+                                    <input type="text" id="portoOrigem" name="portoOrigem" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Ex: Santos"/>
+                                </div>
+                                <div>
+                                    <label for="portoDestino" class="block text-xs font-medium text-slate-400 mb-1">Porto de Destino</label>
+                                    <input type="text" id="portoDestino" name="portoDestino" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Ex: Manaus"/>
+                                    <p class="text-xs text-slate-500 mt-1">Manaus, PCM e Pecém geram alerta automático</p>
+                                </div>
+                                <div>
+                                    <label for="valorCarga" class="block text-xs font-medium text-slate-400 mb-1">Valor do CT-e (R$)</label>
+                                    <input type="number" id="valorCarga" name="valorCarga" step="0.01" min="0" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="0,00"/>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Submit Section -->
                         <div class="mt-8 flex items-center justify-between border-t border-slate-700 pt-6">
                             <p class="text-xs text-slate-400">A integridade do arquivo sera validada no servidor.</p>

@@ -1,5 +1,6 @@
 package com.alianca.nforaprazo.model;
 
+import com.alianca.nforaprazo.model.enums.Responsavel;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,9 +40,10 @@ public class AutoInfracao {
     @Column(name = "arquivo_pdf_auto", length = 255)
     private String arquivoPdfAuto;
 
-    @Column(name = "responsavel", length = 30)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "responsavel", nullable = false, length = 30)
     @Builder.Default
-    private String responsavel = "PENDENTE";
+    private Responsavel responsavel = Responsavel.PENDENTE;
 
     @Column(name = "motivo_erro", columnDefinition = "TEXT")
     private String motivoErro;

@@ -1,22 +1,20 @@
 package com.alianca.nforaprazo.service;
 
-import com.alianca.nforaprazo.model.Cte;
-import com.alianca.nforaprazo.model.AutoInfracao;
-import com.alianca.nforaprazo.model.Pagamento;
-import com.alianca.nforaprazo.model.Usuario;
+import com.alianca.nforaprazo.dto.*;
+import com.alianca.nforaprazo.model.*;
+import com.alianca.nforaprazo.model.enums.Responsavel;
 import com.alianca.nforaprazo.model.enums.StatusCte;
 import com.alianca.nforaprazo.repository.AutoInfracaoRepository;
 import com.alianca.nforaprazo.repository.CteRepository;
+import com.alianca.nforaprazo.repository.EncSemAutoRepository;
 import com.alianca.nforaprazo.repository.PagamentoRepository;
 import com.alianca.nforaprazo.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -27,8 +25,10 @@ public class DescargaService {
     private final CteRepository cteRepository;
     private final AutoInfracaoRepository autoInfracaoRepository;
     private final PagamentoRepository pagamentoRepository;
+    private final EncSemAutoRepository encSemAutoRepository;
     private final UsuarioRepository usuarioRepository;
     private final StorageService storageService;
+    private final EmailService emailService;
 
     @Transactional
     public Cte confirmarDesembaraco(UUID cteId, String emailUsuario) {
@@ -39,74 +39,122 @@ public class DescargaService {
     }
 
     @Transactional
-    public AutoInfracao registrarAutoInfracao(UUID cteId, MultipartFile autoPdf, String emailUsuario) {
-        Cte cte = buscarCteEValidarStatus(cteId, StatusCte.DESEMBARACADO);
+    public AutoInfracao registrarAutoInfracao(AutoInfracaoRequest request, String emailUsuario) {
+        Cte cte = buscarCteEValidarStatus(request.getCteId(), StatusCte.DESEMBARACADO);
         
-        String pathPdf = storageService.store(autoPdf);
+        String pathPdf = storageService.store(request.getAutoInfracaoPdf());
         
         AutoInfracao auto = AutoInfracao.builder()
                 .cte(cte)
                 .arquivoPdfAuto(pathPdf)
+                .responsavel(Responsavel.PENDENTE)
                 .build();
                 
         cte.setStatus(StatusCte.AUTO_RECEBIDO);
         cteRepository.save(cte);
+        AutoInfracao autoSalvo = autoInfracaoRepository.save(auto);
         
-        log.info("Auto de Infração registrado para CT-e {} por {}", cteId, emailUsuario);
-        return autoInfracaoRepository.save(auto);
+        log.info("Auto de Infração registrado para CT-e {} por {}. Disparando e-mail para Docs Fiscal.", request.getCteId(), emailUsuario);
+        emailService.enviarAlertaDocsFiscal(cte);
+        
+        return autoSalvo;
     }
 
     @Transactional
-    public Pagamento registrarDar(UUID cteId, MultipartFile darPdf, String emailUsuario) {
-        Cte cte = buscarCteEValidarStatus(cteId, StatusCte.AUTO_RECEBIDO);
+    public Pagamento registrarDar(DarRequest request, String emailUsuario) {
+        Cte cte = buscarCteEValidarStatus(request.getCteId(), StatusCte.AGUARDANDO_PAGAMENTO);
         
-        // Pelo fluxo atual, o Auto deve existir
         AutoInfracao auto = cte.getAutoInfracao();
         if (auto == null) {
             throw new IllegalStateException("CT-e não possui Auto de Infração vinculado.");
         }
         
+        if (auto.getResponsavel() == Responsavel.PENDENTE) {
+            throw new IllegalStateException("A investigação da equipe DOCS_FISCAL ainda não foi concluída.");
+        }
+        
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário inválido"));
 
-        String pathDar = storageService.store(darPdf);
+        String pathDar = storageService.store(request.getDarPdf());
         
-        Pagamento pagamento = Pagamento.builder()
-                .autoInfracao(auto)
-                .pathDarPdf(pathDar)
-                .usuarioRegistro(usuario)
-                .build();
-                
-        cte.setStatus(StatusCte.AGUARDANDO_PAGAMENTO);
-        cteRepository.save(cte);
+        Pagamento pagamento = auto.getPagamento();
+        if (pagamento == null) {
+            pagamento = Pagamento.builder()
+                    .autoInfracao(auto)
+                    .pathDarPdf(pathDar)
+                    .usuarioRegistro(usuario)
+                    .build();
+        } else {
+            pagamento.setPathDarPdf(pathDar);
+        }
         
-        log.info("DAR registrado para CT-e {} por {}", cteId, emailUsuario);
+        log.info("DAR registrado para CT-e {} por {}", request.getCteId(), emailUsuario);
         return pagamentoRepository.save(pagamento);
     }
 
     @Transactional
-    public Pagamento registrarComprovante(UUID cteId, BigDecimal valorPago, LocalDate dataPagamento, MultipartFile comprovantePdf, MultipartFile capaPdf, String emailUsuario) {
-        Cte cte = buscarCteEValidarStatus(cteId, StatusCte.AGUARDANDO_PAGAMENTO);
+    public Pagamento registrarComprovante(ComprovanteRequest request, String emailUsuario) {
+        Cte cte = buscarCteEValidarStatus(request.getCteId(), StatusCte.AGUARDANDO_PAGAMENTO);
         
         AutoInfracao auto = cte.getAutoInfracao();
+        if (auto == null) {
+            throw new IllegalStateException("CT-e não possui Auto de Infração vinculado.");
+        }
+        
+        if (auto.getResponsavel() == Responsavel.PENDENTE) {
+            throw new IllegalStateException("A investigação da equipe DOCS_FISCAL ainda não foi concluída.");
+        }
+        
         Pagamento pagamento = auto.getPagamento();
         if (pagamento == null) {
             throw new IllegalStateException("Nenhum DAR foi registrado para este CT-e ainda.");
         }
         
-        String pathComprovante = storageService.store(comprovantePdf);
-        String pathCapa = (capaPdf != null && !capaPdf.isEmpty()) ? storageService.store(capaPdf) : null;
+        String pathComprovante = storageService.store(request.getComprovantePdf());
+        String pathCapa = (request.getCapaPdf() != null && !request.getCapaPdf().isEmpty()) ? storageService.store(request.getCapaPdf()) : null;
         
-        pagamento.setValorPago(valorPago);
-        pagamento.setDataPagamento(dataPagamento);
+        pagamento.setValorPago(request.getValorPago());
+        pagamento.setDataPagamento(request.getDataPagamento());
         pagamento.setPathComprovantePdf(pathComprovante);
         if (pathCapa != null) pagamento.setPathCapaPdf(pathCapa);
         
         cte.setStatus(StatusCte.PAGO);
         cteRepository.save(cte);
+        Pagamento pagamentoSalvo = pagamentoRepository.save(pagamento);
         
-        log.info("Comprovante de pagamento registrado para CT-e {} por {}", cteId, emailUsuario);
-        return pagamentoRepository.save(pagamento);
+        log.info("Comprovante de pagamento registrado para CT-e {} por {}. Disparando e-mail para Faturamento.", request.getCteId(), emailUsuario);
+        emailService.enviarAlertaFaturamento(cte);
+        
+        return pagamentoSalvo;
+    }
+
+    @Transactional
+    public EncSemAuto encerrarSemAuto(EncSemAutoRequest request, String emailUsuario) {
+        Cte cte = buscarCteEValidarStatus(request.getCteId(), StatusCte.DESEMBARACADO);
+
+        Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário inválido"));
+
+        BigDecimal valorPotencialMulta = cte.getValorPotencialMulta();
+
+        EncSemAuto enc = EncSemAuto.builder()
+                .cte(cte)
+                .valorPotencialMulta(valorPotencialMulta)
+                .justificativa(request.getJustificativa())
+                .usuario(usuario)
+                .build();
+
+        cte.setStatus(StatusCte.ENCERRADO_SEM_AUTO);
+        cteRepository.save(cte);
+        EncSemAuto encSalvo = encSemAutoRepository.save(enc);
+
+        log.info("Processo do CT-e {} encerrado SEM auto por {}. Multa evitada: R$ {}.", 
+                cte.getId(), emailUsuario, valorPotencialMulta);
+
+        emailService.enviarAlertaEncerramentoSemAuto(cte);
+
+        return encSalvo;
     }
     
     private Cte buscarCteEValidarStatus(UUID cteId, StatusCte statusEsperado) {
