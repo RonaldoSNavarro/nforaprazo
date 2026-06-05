@@ -54,7 +54,7 @@ public class CteService {
             .chaveAcesso(chaveExtraida) // Pode ser null se falhou na extracao, ai preenche manualmente
             .arquivoPdfPath(fileName)
             .nomeOriginalArquivo(file.getOriginalFilename())
-            .status(StatusCte.PENDENTE_DESCARGA)
+            .status(StatusCte.AGUARDANDO_DESEMBARACO)
             .usuarioUpload(usuario)
             .build();
             

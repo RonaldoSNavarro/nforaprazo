@@ -31,45 +31,70 @@ public class DescargaController {
 
     @GetMapping("/pendentes")
     public String listarPendentes(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Cte> pendentes = cteRepository.findByStatus(
-                StatusCte.PENDENTE_DESCARGA, 
+        Page<Cte> pendentes = cteRepository.findByStatusIn(
+                java.util.List.of(
+                        StatusCte.AGUARDANDO_DESEMBARACO,
+                        StatusCte.DESEMBARACADO,
+                        StatusCte.AUTO_RECEBIDO,
+                        StatusCte.AGUARDANDO_PAGAMENTO
+                ), 
                 PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "dataUpload")));
         
         model.addAttribute("ctes", pendentes);
         return "descarga/pendentes";
     }
 
-    @GetMapping("/pagamento/{id}")
-    public String exibirFormPagamento(@PathVariable UUID id, Model model) {
-        Cte cte = cteRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));
-                
-        if (cte.getStatus() != StatusCte.PENDENTE_DESCARGA) {
-            return "redirect:/descarga/pendentes";
+    @PostMapping("/confirmar-desembaraco")
+    public String confirmarDesembaraco(@RequestParam("cteId") UUID cteId, Authentication authentication, RedirectAttributes redirectAttributes) {
+        try {
+            descargaService.confirmarDesembaraco(cteId, authentication.getName());
+            redirectAttributes.addFlashAttribute("sucesso", "Desembaraço confirmado!");
+        } catch (Exception e) {
+            log.error("Erro", e);
+            redirectAttributes.addFlashAttribute("erro", "Erro: " + e.getMessage());
         }
-        
-        model.addAttribute("cte", cte);
-        return "descarga/pagamento";
+        return "redirect:/descarga/pendentes";
     }
 
-    @PostMapping("/pagamento")
-    public String registrarPagamento(@RequestParam("cteId") UUID cteId,
-                                     @RequestParam("valorMulta") BigDecimal valorMulta,
-                                     @RequestParam("dataPagamento") LocalDate dataPagamento,
-                                     @RequestParam("darPdf") MultipartFile darPdf,
-                                     @RequestParam("comprovantePdf") MultipartFile comprovantePdf,
-                                     @RequestParam("autoInfracaoPdf") MultipartFile autoInfracaoPdf,
-                                     @RequestParam(value = "capaPdf", required = false) MultipartFile capaPdf,
-                                     Authentication authentication,
-                                     RedirectAttributes redirectAttributes) {
+    @PostMapping("/auto-infracao")
+    public String registrarAutoInfracao(@RequestParam("cteId") UUID cteId, @RequestParam("autoInfracaoPdf") MultipartFile autoInfracaoPdf, Authentication authentication, RedirectAttributes redirectAttributes) {
         try {
-            descargaService.registrarPagamento(cteId, valorMulta, dataPagamento, darPdf, comprovantePdf, autoInfracaoPdf, capaPdf, authentication.getName());
-            redirectAttributes.addFlashAttribute("sucesso", "Pagamento SEFAZ registrado e CT-e desembaraçado com sucesso!");
-            return "redirect:/descarga/pendentes";
+            descargaService.registrarAutoInfracao(cteId, autoInfracaoPdf, authentication.getName());
+            redirectAttributes.addFlashAttribute("sucesso", "Auto de Infração registrado!");
         } catch (Exception e) {
-            log.error("Erro ao registrar pagamento: ", e);
-            redirectAttributes.addFlashAttribute("erro", "Erro ao registrar pagamento: " + e.getMessage());
-            return "redirect:/descarga/pagamento/" + cteId;
+            log.error("Erro", e);
+            redirectAttributes.addFlashAttribute("erro", "Erro: " + e.getMessage());
         }
+        return "redirect:/descarga/pendentes";
+    }
+
+    @PostMapping("/dar")
+    public String registrarDar(@RequestParam("cteId") UUID cteId, @RequestParam("darPdf") MultipartFile darPdf, Authentication authentication, RedirectAttributes redirectAttributes) {
+        try {
+            descargaService.registrarDar(cteId, darPdf, authentication.getName());
+            redirectAttributes.addFlashAttribute("sucesso", "DAR registrado com sucesso!");
+        } catch (Exception e) {
+            log.error("Erro", e);
+            redirectAttributes.addFlashAttribute("erro", "Erro: " + e.getMessage());
+        }
+        return "redirect:/descarga/pendentes";
+    }
+
+    @PostMapping("/comprovante")
+    public String registrarComprovante(@RequestParam("cteId") UUID cteId, 
+                                       @RequestParam("valorPago") BigDecimal valorPago, 
+                                       @RequestParam("dataPagamento") LocalDate dataPagamento, 
+                                       @RequestParam("comprovantePdf") MultipartFile comprovantePdf, 
+                                       @RequestParam(value = "capaPdf", required = false) MultipartFile capaPdf, 
+                                       Authentication authentication, 
+                                       RedirectAttributes redirectAttributes) {
+        try {
+            descargaService.registrarComprovante(cteId, valorPago, dataPagamento, comprovantePdf, capaPdf, authentication.getName());
+            redirectAttributes.addFlashAttribute("sucesso", "Comprovante registrado e pagamento finalizado!");
+        } catch (Exception e) {
+            log.error("Erro", e);
+            redirectAttributes.addFlashAttribute("erro", "Erro: " + e.getMessage());
+        }
+        return "redirect:/descarga/pendentes";
     }
 }

@@ -54,7 +54,7 @@ public class Cte {
     private Integer versao = 0;
 
     @OneToOne(mappedBy = "cte", cascade = CascadeType.ALL)
-    private PagamentoSefaz pagamento;
+    private AutoInfracao autoInfracao;
 
     @PreUpdate
     protected void onUpdate() {

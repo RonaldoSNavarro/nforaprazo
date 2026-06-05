@@ -9,35 +9,32 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "pagamento_sefaz")
+@Table(name = "pagamento")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PagamentoSefaz {
+public class Pagamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cte_id", nullable = false, unique = true)
-    private Cte cte;
+    @JoinColumn(name = "auto_infracao_id", nullable = false, unique = true)
+    private AutoInfracao autoInfracao;
 
-    @Column(name = "valor_multa", precision = 15, scale = 2, nullable = false)
-    private BigDecimal valorMulta;
+    @Column(name = "valor_pago", precision = 15, scale = 2)
+    private BigDecimal valorPago;
 
-    @Column(name = "data_pagamento", nullable = false)
+    @Column(name = "data_pagamento")
     private LocalDate dataPagamento;
 
-    @Column(name = "path_dar_pdf", nullable = false, length = 255)
+    @Column(name = "path_dar_pdf", length = 255)
     private String pathDarPdf;
 
-    @Column(name = "path_comprovante_pdf", nullable = false, length = 255)
+    @Column(name = "path_comprovante_pdf", length = 255)
     private String pathComprovantePdf;
-
-    @Column(name = "path_auto_infracao_pdf", nullable = false, length = 255)
-    private String pathAutoInfracaoPdf;
 
     @Column(name = "path_capa_pdf", length = 255)
     private String pathCapaPdf;

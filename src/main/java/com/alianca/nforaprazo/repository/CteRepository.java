@@ -13,6 +13,7 @@ import java.util.UUID;
 public interface CteRepository extends JpaRepository<Cte, UUID> {
     
     Page<Cte> findByStatus(StatusCte status, Pageable pageable);
+    Page<Cte> findByStatusIn(java.util.List<StatusCte> statuses, Pageable pageable);
     
     boolean existsByChaveAcesso(String chaveAcesso);
 }
