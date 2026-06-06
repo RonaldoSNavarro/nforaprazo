@@ -89,6 +89,18 @@ O projeto é configurado para rodar em containers Docker, persistindo os dados e
 
 ---
 
+## 🧪 Como Executar os Testes Automatizados
+
+O sistema conta com uma suíte de **23 testes unitários e de integração** validando todas as regras fiscais críticas de multas, o roteamento automático de portos monitorados e as restrições da máquina de estados do CT-e.
+
+Para executar toda a suíte de testes utilizando o Docker (sem precisar do Maven instalado localmente no host Windows), execute o comando a seguir no terminal:
+
+```bash
+docker run --rm -v f:/Dev/Projetos/nforaprazo:/app -v C:/Users/ronal/.m2:/root/.m2 -w /app maven:3.9-eclipse-temurin-21 mvn test
+```
+
+---
+
 ## 🔒 Regras de Negócio e Auditoria Críticas
 
 1. **Reembolso Exato (RN02):** O valor cobrado na Nota de Débito ao cliente deve ser exatamente igual ao valor pago registrado no DAR correspondente.
