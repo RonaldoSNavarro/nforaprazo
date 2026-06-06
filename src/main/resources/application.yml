@@ -2,15 +2,6 @@ spring:
   application:
     name: nforaprazo
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, metrics, info
-  endpoint:
-    health:
-      show-details: when_authorized
-
   datasource:
     url: jdbc:postgresql://localhost:5432/nfora_prazo_dev
     username: ${DB_USER:postgres}
@@ -48,6 +39,15 @@ management:
 
   thymeleaf:
     cache: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, info
+  endpoint:
+    health:
+      show-details: when_authorized
 
 file:
   upload-dir: ${FILE_UPLOAD_DIR:uploads}
