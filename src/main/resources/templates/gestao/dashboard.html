@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="pt-BR">
+<head th:replace="~{fragments/layout :: head('Dashboard Executivo')}">
+    <title>Dashboard Executivo</title>
+</head>
+<body class="font-body bg-slate-950 min-h-screen text-slate-100">
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <!-- Main Content -->
+    <div class="min-h-screen transition-all duration-300" id="main-content">
+        <!-- Topbar -->
+        <div th:replace="~{fragments/layout :: topbar}"></div>
+
+        <main class="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
+            
+            <!-- Page Title -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="font-display text-2xl lg:text-3xl font-bold bg-gradient-to-r from-slate-50 to-slate-350 bg-clip-text text-transparent">
+                        Painel Executivo
+                    </h1>
+                    <p class="text-slate-400 text-sm mt-1">Métricas, gráficos e relatórios consolidados do sistema.</p>
+                </div>
+                <!-- Action Button if any -->
+            </div>
+
+            <!-- Section 1: Filters & Report Export (RF13) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <h2 class="font-display text-lg font-bold text-slate-50">Exportação de Relatório &amp; Filtros</h2>
+                </div>
+                <form th:action="@{/dashboard/exportar}" method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div>
+                        <label for="portoDestino" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Porto de Destino</label>
+                        <input type="text" id="portoDestino" name="portoDestino" placeholder="Ex: Manaus"
+                               class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
+                    </div>
+                    <div>
+                        <label for="dataInicio" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Data Início (Upload)</label>
+                        <input type="date" id="dataInicio" name="dataInicio"
+                               class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
+                    </div>
+                    <div>
+                        <label for="dataFim" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Data Fim (Upload)</label>
+                        <input type="date" id="dataFim" name="dataFim"
+                               class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
+                    </div>
+                    <div>
+                        <button type="submit" id="btn-exportar"
+                                class="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-slate-950 font-bold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-lg shadow-emerald-500/10 flex items-center justify-center gap-2 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Exportar Excel
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Section 2: KPIs (RF12) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1: Exposição Total -->
+                <div class="card-hover bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-bl-full pointer-events-none transition-all group-hover:bg-amber-500/10"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Exposição Total</span>
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+                            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-3xl font-display font-bold text-slate-50"
+                        th:text="${'R$ ' + #numbers.formatDecimal(dashboardData.exposicaoTotal, 1, 'POINT', 2, 'COMMA')}">
+                        R$ 0,00
+                    </h3>
+                    <p class="text-slate-500 text-xs mt-2">Valores potenciais de multas ativas</p>
+                </div>
+
+                <!-- Card 2: Multas Pagas -->
+                <div class="card-hover bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-bl-full pointer-events-none transition-all group-hover:bg-red-500/10"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Multas Pagas</span>
+                        <div class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center border border-red-500/20">
+                            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-3xl font-display font-bold text-slate-50"
+                        th:text="${'R$ ' + #numbers.formatDecimal(dashboardData.multasPagas, 1, 'POINT', 2, 'COMMA')}">
+                        R$ 0,00
+                    </h3>
+                    <p class="text-slate-500 text-xs mt-2">Volume desembolsado e liquidado</p>
+                </div>
+
+                <!-- Card 3: Multas Evitadas -->
+                <div class="card-hover bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full pointer-events-none transition-all group-hover:bg-emerald-500/10"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Multas Evitadas</span>
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-3xl font-display font-bold text-slate-50"
+                        th:text="${'R$ ' + #numbers.formatDecimal(dashboardData.multasEvitadas, 1, 'POINT', 2, 'COMMA')}">
+                        R$ 0,00
+                    </h3>
+                    <p class="text-slate-500 text-xs mt-2">Custo evitado (encerrados sem auto)</p>
+                </div>
+            </div>
+
+            <!-- Section 3: Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Monthly Evolution Line Chart -->
+                <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-[400px]">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-display text-base font-bold text-slate-50">Evolução Mensal de Autuações</h3>
+                        <span class="text-xs text-slate-500">Filtrado por data de emissão do auto</span>
+                    </div>
+                    <div class="flex-1 relative">
+                        <canvas id="evolucaoChart"></canvas>
+                        <!-- Fallback message in case of no data -->
+                        <div id="evolucaoFallback" class="hidden absolute inset-0 flex items-center justify-center text-slate-500 text-sm">
+                            Nenhuma autuação registrada até o momento.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Responsibility Pie Chart -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-[400px]">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-display text-base font-bold text-slate-50">Distribuição de Responsabilidades</h3>
+                        <span class="text-xs text-slate-500">Participação de custo</span>
+                    </div>
+                    <div class="flex-1 relative">
+                        <canvas id="responsabilidadeChart"></canvas>
+                        <!-- Fallback message in case of no data -->
+                        <div id="responsabilidadeFallback" class="hidden absolute inset-0 flex items-center justify-center text-slate-500 text-sm">
+                            Nenhuma atribuição de responsabilidade registrada.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Reincidente Ranking Table -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="font-display text-lg font-bold text-slate-50">Top 5 Tomadores Reincidentes</h3>
+                        <p class="text-slate-400 text-xs mt-1">Ranking baseado no volume de autuações emitidas.</p>
+                    </div>
+                    <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-wide">Alerta de Risco</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 font-semibold">
+                                <th class="pb-3 pl-2">Tomador (Cliente)</th>
+                                <th class="pb-3 text-center">Quantidade de Autuações</th>
+                                <th class="pb-3 text-right pr-2">Custo Total Acumulado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loop over top 5 -->
+                            <tr th:each="tomador, iterStat : ${dashboardData.reincidentes}" class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                                <td class="py-3.5 pl-2 font-medium text-slate-200">
+                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-md bg-slate-800 border border-slate-700 text-xs font-bold text-slate-400 mr-2"
+                                          th:text="${iterStat.count}">1</span>
+                                    <span th:text="${tomador.tomadorNome}">TOMADOR S/A</span>
+                                </td>
+                                <td class="py-3.5 text-center text-slate-350" th:text="${tomador.quantidade}">0</td>
+                                <td class="py-3.5 text-right pr-2 font-semibold text-slate-100"
+                                    th:text="${'R$ ' + #numbers.formatDecimal(tomador.valorTotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(dashboardData.reincidentes)}">
+                                <td colspan="3" class="py-8 text-center text-slate-500">Nenhum tomador com infrações registradas.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+    
+    <!-- Load Chart.js local version (no internet needed) -->
+    <script th:src="@{/js/chart.js}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const evolucaoDados = /*[[${dashboardData.evolucaoMensal}]]*/ [];
+        const responsabilidadeDados = /*[[${dashboardData.responsabilidade}]]*/ [];
+        /*]]>*/
+
+        // Chart.js global defaults for slate styling
+        Chart.defaults.color = '#94a3b8'; // slate-400
+        Chart.defaults.font.family = 'Inter, sans-serif';
+
+        // 1. Render Monthly Evolution Chart
+        if (!evolucaoDados || evolucaoDados.length === 0) {
+            document.getElementById('evolucaoFallback').classList.remove('hidden');
+            document.getElementById('evolucaoChart').style.display = 'none';
+        } else {
+            const labels = evolucaoDados.map(item => {
+                const mes = String(item.mes).padStart(2, '0');
+                return `${mes}/${item.ano}`;
+            });
+            const quantidades = evolucaoDados.map(item => item.quantidade);
+            const valores = evolucaoDados.map(item => item.valorTotal);
+
+            const ctx = document.getElementById('evolucaoChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Valor Total de Multas (R$)',
+                            data: valores,
+                            borderColor: '#f59e0b', // amber-500
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3,
+                            yAxisID: 'yValor'
+                        },
+                        {
+                            label: 'Qtd de Autuações',
+                            data: quantidades,
+                            borderColor: '#38bdf8', // sky-400
+                            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                            borderWidth: 2,
+                            type: 'bar',
+                            yAxisID: 'yQtd'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: '#0f172a',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#334155',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(51, 65, 85, 0.3)' // slate-700
+                            }
+                        },
+                        yValor: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: {
+                                color: 'rgba(51, 65, 85, 0.3)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                                }
+                            }
+                        },
+                        yQtd: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Render Responsibility Chart
+        if (!responsabilidadeDados || responsabilidadeDados.length === 0) {
+            document.getElementById('responsabilidadeFallback').classList.remove('hidden');
+            document.getElementById('responsabilidadeChart').style.display = 'none';
+        } else {
+            // Mapping responsibilities
+            const labelsMap = {
+                'ALIANCA': 'Aliança Navegação',
+                'CLIENTE': 'Cliente / Tomador',
+                'PENDENTE': 'Investigação Pendente'
+            };
+
+            const labels = responsabilidadeDados.map(item => labelsMap[item.responsavel] || item.responsavel);
+            const valores = responsabilidadeDados.map(item => item.valorTotal);
+            
+            const backgroundColors = responsabilidadeDados.map(item => {
+                if (item.responsavel === 'ALIANCA') return '#ef4444'; // red-500 (prejuízo nosso)
+                if (item.responsavel === 'CLIENTE') return '#10b981'; // emerald-500 (reembolsável)
+                return '#f59e0b'; // amber-500 (pendente)
+            });
+
+            const ctx = document.getElementById('responsabilidadeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: valores,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 2,
+                        borderColor: '#0f172a' // slate-900
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    return ` ${context.label}: R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                                }
+                            },
+                            backgroundColor: '#0f172a',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#334155',
+                            borderWidth: 1
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+    </script>
+</body>
+</html>

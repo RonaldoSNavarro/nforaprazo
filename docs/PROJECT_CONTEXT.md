@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md — Sistema NF Fora do Prazo
-> Status: 🟢 FASE 4 CONCLUÍDA
-> Fase atual: **FASE 5 — Dashboard (iniciando)**
-> Última atualização: 2026-06-05 | Atualizado por: CTO Agent
+> Status: 🟢 FASE 5 CONCLUÍDA
+> Fase atual: **FASE 6 — Go-Live (iniciando)**
+> Última atualização: 2026-06-06 | Atualizado por: CTO Agent
 > Para requisitos detalhados, consulte: REQUIREMENTS.md
  
 ---
@@ -60,8 +60,8 @@ com.alianca.nforaprazo
 [🟢] Fase 2 — Desembaraço/Pgto (Semanas 6-9)   → CONCLUÍDA (Refatorada para Máquina de Estados)
 [🟢] Fase 3 — Auto de Infração  (Semanas 10-11) → CONCLUÍDA (Investigação e Notificações)
 [🟢] Fase 4 — Sem Auto + Nota   (Semanas 12-13) → CONCLUÍDA (Faturamento e DTO Validation)
-[ ] Fase 5 — Dashboard         (Semanas 14-16) → não iniciada
-[ ] Fase 6 — Go-Live           (Semanas 17-18) → não iniciada
+[🟢] Fase 5 — Dashboard         (Semanas 14-16) → CONCLUÍDA
+[🟡] Fase 6 — Go-Live           (Semanas 17-18) → em andamento
 ```
  
 ### Entregáveis da Fase 0 (CONCLUÍDA)
@@ -109,6 +109,12 @@ com.alianca.nforaprazo
 - [x] Refatoração completa dos controladores para recebimento e validação via `@Valid DTO`
 - [x] nota-debito.html — tela de faturamento / descarga/pendentes.html — modal de encerramento sem auto
 - [x] Correção de links quebrados nos painéis de cards de home.html e layout.html
+
+### Entregáveis da Fase 5 (CONCLUÍDA)
+- [x] DashboardService.java e GestaoController.java — endpoints de controle e serviço
+- [x] gestao/dashboard.html — painel visual de KPIs, evolução mensal e pizza de responsabilidades (Chart.js)
+- [x] ExcelExportService.java — serviço para geração de relatórios .xlsx com filtros por porto e data
+- [x] Criação de suíte de testes unitários automatizados em src/test/java validando regras fiscais críticas de multas, máquina de estados e roteamento (CteTest, CteServiceTest, DescargaServiceTest, DocsFiscalServiceTest, ExcelExportServiceTest)
  
 ---
  
@@ -153,6 +159,7 @@ Nomenclatura: Classes PascalCase PT-BR | Métodos camelCase PT-BR | Migrations V
 | Fase 2 | 2026-06-04 | Pagamento SEFAZ, Optimistic Locking, upload triplo, Máquina de Estados Refatorada |
 | Fase 3 | 2026-06-05 | Investigação DOCS_FISCAL, Notificações EmailService, Logs de Alertas |
 | Fase 4 | 2026-06-05 | Encerramento Sem Auto, Emissão de Notas de Débito, Validação Bean Validation com DTOs |
+| Fase 5 | 2026-06-06 | Dashboard Executivo, Relatório Excel e Suíte Completa de Testes Automatizados |
  
 ---
  
