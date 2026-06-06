@@ -21,7 +21,7 @@ public class LogAlerta {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cte_id", nullable = false)
+    @JoinColumn(name = "cte_id", nullable = true)
     private Cte cte;
 
     @Enumerated(EnumType.STRING)

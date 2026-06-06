@@ -103,6 +103,7 @@ com.alianca.nforaprazo
 ### Entregáveis da Fase 4 (CONCLUÍDA)
 - [x] V12__create_nota_debito_and_enc_sem_auto.sql — migration para tabelas nota_debito e enc_sem_auto
 - [x] V13__fix_pago_responsibility_for_test.sql — migration para correção de dados legados inconsistentes
+- [x] V14__add_admin_and_log_atividade.sql — migration para logs de atividade, flag de alteração de senha e suporte ao perfil ADMINISTRADOR
 - [x] EncSemAuto.java e NotaDebito.java — entidades JPA mapeadas
 - [x] Request DTOs com validação Bean Validation (Size, NotBlank, NotNull)
 - [x] FaturamentoService.java e FaturamentoController.java — fluxo de Notas de Débito e Absorção de Custos
@@ -114,7 +115,11 @@ com.alianca.nforaprazo
 - [x] DashboardService.java e GestaoController.java — endpoints de controle e serviço
 - [x] gestao/dashboard.html — painel visual de KPIs, evolução mensal e pizza de responsabilidades (Chart.js)
 - [x] ExcelExportService.java — serviço para geração de relatórios .xlsx com filtros por porto e data
-- [x] Criação de suíte de testes unitários automatizados em src/test/java validando regras fiscais críticas de multas, máquina de estados e roteamento (CteTest, CteServiceTest, DescargaServiceTest, DocsFiscalServiceTest, ExcelExportServiceTest)
+- [x] Criação de suíte de testes unitários automatizados em src/test/java validando regras fiscais críticas de multas, máquina de estados, roteamento, controle de acesso e auditoria (33 testes no total: CteTest, CteServiceTest, DescargaServiceTest, DocsFiscalServiceTest, ExcelExportServiceTest, AdminControllerTest, ForcarSenhaFiltroTest, AuditoriaAspectTest)
+- [x] Painel Administrativo de Usuários — Cadastro de integrantes, atribuição de perfis, geração de senha provisória aleatória de 8 caracteres e e-mail automático.
+- [x] Troca Obrigatória de Senha — Bloqueio e redirecionamento de URLs operacionais caso o usuário logado esteja com flag de alteração ativa.
+- [x] Trilha de Auditoria via Spring AOP — Aspecto customizado @Auditable interceptando e persistindo ações e parâmetros de entrada (com ocultação de senhas) no banco.
+- [x] Observabilidade de Saúde — Integração com o Spring Boot Actuator exposto nas rotas /actuator/health e /actuator/metrics protegidas via RBAC.
  
 ---
  

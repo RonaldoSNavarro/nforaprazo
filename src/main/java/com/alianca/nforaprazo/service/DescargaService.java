@@ -1,5 +1,6 @@
 package com.alianca.nforaprazo.service;
 
+import com.alianca.nforaprazo.annotation.Auditable;
 import com.alianca.nforaprazo.dto.*;
 import com.alianca.nforaprazo.model.*;
 import com.alianca.nforaprazo.model.enums.Responsavel;
@@ -31,6 +32,7 @@ public class DescargaService {
     private final EmailService emailService;
 
     @Transactional
+    @Auditable(acao = "Confirmacao de Desembaraco")
     public Cte confirmarDesembaraco(UUID cteId, String emailUsuario) {
         Cte cte = buscarCteEValidarStatus(cteId, StatusCte.AGUARDANDO_DESEMBARACO);
         cte.setStatus(StatusCte.DESEMBARACADO);
@@ -39,6 +41,7 @@ public class DescargaService {
     }
 
     @Transactional
+    @Auditable(acao = "Registro de Auto de Infracao")
     public AutoInfracao registrarAutoInfracao(AutoInfracaoRequest request, String emailUsuario) {
         Cte cte = buscarCteEValidarStatus(request.getCteId(), StatusCte.DESEMBARACADO);
         
@@ -61,6 +64,7 @@ public class DescargaService {
     }
 
     @Transactional
+    @Auditable(acao = "Registro de Guia/DAR")
     public Pagamento registrarDar(DarRequest request, String emailUsuario) {
         Cte cte = buscarCteEValidarStatus(request.getCteId(), StatusCte.AGUARDANDO_PAGAMENTO);
         
@@ -94,6 +98,7 @@ public class DescargaService {
     }
 
     @Transactional
+    @Auditable(acao = "Registro de Comprovante de Pagamento")
     public Pagamento registrarComprovante(ComprovanteRequest request, String emailUsuario) {
         Cte cte = buscarCteEValidarStatus(request.getCteId(), StatusCte.AGUARDANDO_PAGAMENTO);
         
@@ -130,6 +135,7 @@ public class DescargaService {
     }
 
     @Transactional
+    @Auditable(acao = "Encerramento Sem Auto de Infracao")
     public EncSemAuto encerrarSemAuto(EncSemAutoRequest request, String emailUsuario) {
         Cte cte = buscarCteEValidarStatus(request.getCteId(), StatusCte.DESEMBARACADO);
 

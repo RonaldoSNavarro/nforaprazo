@@ -21,5 +21,8 @@ public enum TipoAlerta {
     ENCERRADO_COM_AUTO,
 
     /** Encerrado sem auto → notificação geral */
-    ENCERRADO_SEM_AUTO
+    ENCERRADO_SEM_AUTO,
+
+    /** Envio de senha provisória de novo usuário */
+    SENHA_PROVISORIA
 }

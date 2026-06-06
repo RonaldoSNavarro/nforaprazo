@@ -1,5 +1,6 @@
 package com.alianca.nforaprazo.service;
 
+import com.alianca.nforaprazo.annotation.Auditable;
 import com.alianca.nforaprazo.dto.CteUploadRequest;
 import com.alianca.nforaprazo.model.Cte;
 import com.alianca.nforaprazo.model.Usuario;
@@ -41,6 +42,7 @@ public class CteService {
      *    - Demais portos → REGISTRADO (sem alerta)
      */
     @Transactional
+    @Auditable(acao = "Upload de CT-e")
     public Cte processarUploadCte(CteUploadRequest request, String emailUsuario) {
         log.info("Processando novo upload de CT-e enviado por {}", emailUsuario);
         

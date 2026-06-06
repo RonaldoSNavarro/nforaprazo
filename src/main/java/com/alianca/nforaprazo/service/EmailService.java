@@ -152,6 +152,48 @@ public class EmailService {
         enviarEmail(cte, TipoAlerta.ENCERRADO_COM_AUTO, emailFaturamento, assunto, texto);
     }
 
+    @Async
+    public void enviarSenhaProvisoria(String emailDestino, String nomeUsuario, String senhaProvisoria, String linkAcesso) {
+        String assunto = "[NF Fora do Prazo] Cadastro de Usuário e Senha Provisória";
+        String texto = String.format(
+                "Olá %s,\n\n" +
+                "Você foi cadastrado no sistema NF Fora do Prazo.\n\n" +
+                "Suas credenciais de acesso temporárias são:\n" +
+                "E-mail: %s\n" +
+                "Senha Provisória: %s\n\n" +
+                "Link de Acesso: %s\n\n" +
+                "Importante: Por motivos de segurança, você deverá cadastrar uma nova senha logo após o primeiro acesso.",
+                nomeUsuario,
+                emailDestino,
+                senhaProvisoria,
+                linkAcesso
+        );
+        
+        LogAlerta logAlerta = LogAlerta.builder()
+                .cte(null)
+                .tipoAlerta(TipoAlerta.SENHA_PROVISORIA)
+                .destinatario(emailDestino)
+                .assunto(assunto)
+                .dataEnvio(LocalDateTime.now())
+                .build();
+                
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(emailDestino);
+            message.setSubject(assunto);
+            message.setText(texto);
+            mailSender.send(message);
+            logAlerta.setStatusEnvio(StatusEnvio.ENVIADO);
+            log.info("E-mail de senha provisória enviado para {}", emailDestino);
+        } catch (Exception e) {
+            log.error("Erro ao enviar e-mail de senha provisória para {}", emailDestino, e);
+            logAlerta.setStatusEnvio(StatusEnvio.ERRO);
+            logAlerta.setMensagemErro(e.getMessage());
+        } finally {
+            logAlertaRepository.save(logAlerta);
+        }
+    }
+
     private void enviarEmail(Cte cte, TipoAlerta tipo, String destinatario, String assunto, String texto) {
         LogAlerta logAlerta = LogAlerta.builder()
                 .cte(cte)

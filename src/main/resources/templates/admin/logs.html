@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="pt-BR">
+<head th:replace="~{fragments/layout :: head('Auditoria e Logs')}">
+    <title>Auditoria e Logs</title>
+</head>
+<body class="font-body bg-slate-950 min-h-screen text-slate-100">
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <!-- Main Content -->
+    <div class="min-h-screen transition-all duration-300" id="main-content">
+        <!-- Topbar -->
+        <div th:replace="~{fragments/layout :: topbar}"></div>
+
+        <main class="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
+            
+            <!-- Page Title -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="font-display text-2xl lg:text-3xl font-bold bg-gradient-to-r from-slate-50 to-slate-350 bg-clip-text text-transparent">
+                        Auditoria &amp; Logs do Sistema
+                    </h1>
+                    <p class="text-slate-400 text-sm mt-1">Rastreabilidade completa de ações operacionais e disparo de e-mails.</p>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="border-b border-slate-800 flex gap-4">
+                <button onclick="switchTab('atividades')" id="tab-atividades-btn"
+                        class="pb-3 text-sm font-semibold border-b-2 border-amber-500 text-slate-100 focus:outline-none transition-all">
+                    Logs de Atividades
+                </button>
+                <button onclick="switchTab('emails')" id="tab-emails-btn"
+                        class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-350 focus:outline-none transition-all">
+                    Logs de Notificações (E-mails)
+                </button>
+            </div>
+
+            <!-- Tab 1: Logs de Atividades -->
+            <div id="tab-atividades" class="space-y-6">
+                <!-- Filter bar -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                    <form th:action="@{/admin/logs}" method="get" class="flex flex-wrap gap-4 items-end">
+                        <div class="flex-1 min-w-[250px]">
+                            <label for="emailFiltro" class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Filtrar por Usuário (E-mail)</label>
+                            <input type="text" id="emailFiltro" name="emailFiltro" th:value="${emailFiltro}" placeholder="Ex: usuario@email.com"
+                                   class="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-xs">
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit"
+                                    class="py-2 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl transition-all text-xs flex items-center gap-1.5">
+                                Filtrar
+                            </button>
+                            <a th:href="@{/admin/logs}" th:if="${emailFiltro != null}"
+                               class="py-2 px-4 bg-slate-850 hover:bg-slate-800 border border-slate-750 text-slate-300 font-semibold rounded-xl transition-all text-xs">
+                                Limpar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Table Logs -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-400 font-semibold">
+                                    <th class="pb-3 pl-2">Data</th>
+                                    <th class="pb-3">Usuário</th>
+                                    <th class="pb-3">Ação</th>
+                                    <th class="pb-3">Detalhes</th>
+                                    <th class="pb-3 text-center">IP Origem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="log : ${logsAtividade.content}" class="border-b border-slate-800/40 hover:bg-slate-800/25 transition-colors">
+                                    <td class="py-3.5 pl-2 text-slate-400" th:text="${#temporals.format(log.dataCriacao, 'dd/MM/yyyy HH:mm:ss')}">01/01/2026 12:00:00</td>
+                                    <td class="py-3.5 font-medium text-slate-200" th:text="${log.usuarioEmail}">email@email.com</td>
+                                    <td class="py-3.5">
+                                        <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-semibold" th:text="${log.acao}">Cadastro</span>
+                                    </td>
+                                    <td class="py-3.5 max-w-sm truncate text-slate-350 hover:text-slate-200 cursor-help" th:title="${log.detalhes}" th:text="${log.detalhes}">Detalhes...</td>
+                                    <td class="py-3.5 text-center text-slate-500" th:text="${log.ipOrigem}">127.0.0.1</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(logsAtividade.content)}">
+                                    <td colspan="5" class="py-8 text-center text-slate-500">Nenhum log de atividade registrado.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-800 text-[11px]" th:if="${logsAtividade.totalPages > 1}">
+                        <span class="text-slate-500" th:text="'Página ' + (${logsAtividade.number} + 1) + ' de ' + ${logsAtividade.totalPages}">Página 1 de 2</span>
+                        <div class="flex gap-2">
+                            <a th:href="@{/admin/logs(page=${logsAtividade.number - 1}, emailFiltro=${emailFiltro})}" th:if="${logsAtividade.hasPrevious()}"
+                               class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-350 transition-colors">Anterior</a>
+                            <a th:href="@{/admin/logs(page=${logsAtividade.number + 1}, emailFiltro=${emailFiltro})}" th:if="${logsAtividade.hasNext()}"
+                               class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-350 transition-colors">Próximo</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Logs de Notificações (E-mails) -->
+            <div id="tab-emails" class="space-y-6 hidden">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-400 font-semibold">
+                                    <th class="pb-3 pl-2">Data Envio</th>
+                                    <th class="pb-3">Destinatário</th>
+                                    <th class="pb-3">Tipo Alerta</th>
+                                    <th class="pb-3">Assunto</th>
+                                    <th class="pb-3 text-center">Status</th>
+                                    <th class="pb-3">Erro</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="alerta : ${logsAlerta.content}" class="border-b border-slate-800/40 hover:bg-slate-800/25 transition-colors">
+                                    <td class="py-3.5 pl-2 text-slate-400" th:text="${#temporals.format(alerta.dataEnvio, 'dd/MM/yyyy HH:mm:ss')}">01/01/2026 12:00:00</td>
+                                    <td class="py-3.5 font-medium text-slate-200" th:text="${alerta.destinatario}">email@email.com</td>
+                                    <td class="py-3.5 font-semibold text-slate-350" th:text="${alerta.tipoAlerta}">NOVO_CTE</td>
+                                    <td class="py-3.5 text-slate-350" th:text="${alerta.assunto}">Assunto...</td>
+                                    <td class="py-3.5 text-center">
+                                        <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full"
+                                              th:classappend="${alerta.statusEnvio.name() == 'ENVIADO'} ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'">
+                                            <span th:text="${alerta.statusEnvio.name()}">ENVIADO</span>
+                                        </span>
+                                    </td>
+                                    <td class="py-3.5 max-w-xs truncate text-red-400 font-mono text-[10px]" th:title="${alerta.mensagemErro}" th:text="${alerta.mensagemErro}">Sem erros</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(logsAlerta.content)}">
+                                    <td colspan="6" class="py-8 text-center text-slate-500">Nenhum registro de e-mail disparado.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-800 text-[11px]" th:if="${logsAlerta.totalPages > 1}">
+                        <span class="text-slate-500" th:text="'Página ' + (${logsAlerta.number} + 1) + ' de ' + ${logsAlerta.totalPages}">Página 1 de 2</span>
+                        <div class="flex gap-2">
+                            <a th:href="@{/admin/logs(page=${logsAlerta.number - 1})}" th:if="${logsAlerta.hasPrevious()}"
+                               class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-350 transition-colors">Anterior</a>
+                            <a th:href="@{/admin/logs(page=${logsAlerta.number + 1})}" th:if="${logsAlerta.hasNext()}"
+                               class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-350 transition-colors">Próximo</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+
+    <script th:inline="javascript">
+        function switchTab(tab) {
+            const tabAtividades = document.getElementById('tab-atividades');
+            const tabEmails = document.getElementById('tab-emails');
+            const tabAtividadesBtn = document.getElementById('tab-atividades-btn');
+            const tabEmailsBtn = document.getElementById('tab-emails-btn');
+
+            if (tab === 'atividades') {
+                tabAtividades.classList.remove('hidden');
+                tabEmails.classList.add('hidden');
+                
+                tabAtividadesBtn.className = "pb-3 text-sm font-semibold border-b-2 border-amber-500 text-slate-100 focus:outline-none transition-all";
+                tabEmailsBtn.className = "pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-350 focus:outline-none transition-all";
+            } else {
+                tabAtividades.classList.add('hidden');
+                tabEmails.classList.remove('hidden');
+                
+                tabAtividadesBtn.className = "pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-350 focus:outline-none transition-all";
+                tabEmailsBtn.className = "pb-3 text-sm font-semibold border-b-2 border-amber-500 text-slate-100 focus:outline-none transition-all";
+            }
+        }
+    </script>
+</body>
+</html>

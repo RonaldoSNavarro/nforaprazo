@@ -1,5 +1,6 @@
 package com.alianca.nforaprazo.service;
 
+import com.alianca.nforaprazo.annotation.Auditable;
 import com.alianca.nforaprazo.dto.NotaDebitoRequest;
 import com.alianca.nforaprazo.model.Cte;
 import com.alianca.nforaprazo.model.NotaDebito;
@@ -26,6 +27,7 @@ public class FaturamentoService {
     private final EmailService emailService;
 
     @Transactional
+    @Auditable(acao = "Emissao de Nota de Debito")
     public NotaDebito emitirNotaDebito(NotaDebitoRequest request, String emailUsuario) {
         Cte cte = cteRepository.findById(request.getCteId())
                 .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));
@@ -67,6 +69,7 @@ public class FaturamentoService {
     }
 
     @Transactional
+    @Auditable(acao = "Absorcao de Custos")
     public Cte encerrarCustoAbsorvido(UUID cteId, String emailUsuario) {
         Cte cte = cteRepository.findById(cteId)
                 .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));

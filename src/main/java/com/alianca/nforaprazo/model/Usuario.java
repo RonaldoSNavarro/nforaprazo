@@ -36,6 +36,10 @@ public class Usuario {
     @Builder.Default
     private Boolean ativo = true;
 
+    @Column(name = "alterar_senha", nullable = false)
+    @Builder.Default
+    private Boolean alterarSenha = false;
+
     @Column(name = "data_criacao", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime dataCriacao = LocalDateTime.now();

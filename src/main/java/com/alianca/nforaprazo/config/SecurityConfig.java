@@ -8,22 +8,32 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final ForcarSenhaFiltro forcarSenhaFiltro;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/login", "/css/**", "/js/**", "/fonts/**", "/images/**", "/webjars/**").permitAll()
+                .requestMatchers("/alterar-senha").authenticated()
+                .requestMatchers("/admin/**").hasAnyRole("ADMINISTRADOR", "GESTAO")
+                .requestMatchers("/actuator/**").hasAnyRole("ADMINISTRADOR", "GESTAO")
                 .requestMatchers("/faturamento/**").hasRole("FATURAMENTO")
                 .requestMatchers("/descarga/**").hasRole("DESCARGA")
                 .requestMatchers("/docs-fiscal/**").hasRole("DOCS_FISCAL")
                 .requestMatchers("/dashboard/**", "/relatorios").hasRole("GESTAO")
-                .requestMatchers("/cte/**").hasAnyRole("FATURAMENTO", "DESCARGA", "DOCS_FISCAL", "GESTAO")
+                .requestMatchers("/cte/**").hasAnyRole("FATURAMENTO", "DESCARGA", "DOCS_FISCAL", "GESTAO", "ADMINISTRADOR")
                 .anyRequest().authenticated()
             )
+            .addFilterAfter(forcarSenhaFiltro, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")

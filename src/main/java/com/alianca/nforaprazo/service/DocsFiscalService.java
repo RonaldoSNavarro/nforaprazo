@@ -1,5 +1,6 @@
 package com.alianca.nforaprazo.service;
 
+import com.alianca.nforaprazo.annotation.Auditable;
 import com.alianca.nforaprazo.dto.InvestigacaoRequest;
 import com.alianca.nforaprazo.model.AutoInfracao;
 import com.alianca.nforaprazo.model.Cte;
@@ -25,6 +26,7 @@ public class DocsFiscalService {
     private final EmailService emailService;
 
     @Transactional
+    @Auditable(acao = "Inicio de Investigacao")
     public Cte iniciarInvestigacao(UUID cteId, String emailUsuario) {
         Cte cte = cteRepository.findById(cteId)
                 .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));
@@ -39,6 +41,7 @@ public class DocsFiscalService {
     }
 
     @Transactional
+    @Auditable(acao = "Conclusao de Investigacao")
     public AutoInfracao concluirInvestigacao(InvestigacaoRequest request, String emailUsuario) {
         Cte cte = cteRepository.findById(request.getCteId())
                 .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));

@@ -4,5 +4,6 @@ public enum PerfilUsuario {
     FATURAMENTO,
     DESCARGA,
     DOCS_FISCAL,
-    GESTAO
+    GESTAO,
+    ADMINISTRADOR
 }
