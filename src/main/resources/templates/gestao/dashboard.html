@@ -26,41 +26,6 @@
                 <!-- Action Button if any -->
             </div>
 
-            <!-- Section 1: Filters & Report Export (RF13) -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                <div class="flex items-center gap-2 mb-4">
-                    <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <h2 class="font-display text-lg font-bold text-slate-50">Exportação de Relatório &amp; Filtros</h2>
-                </div>
-                <form th:action="@{/dashboard/exportar}" method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    <div>
-                        <label for="portoDestino" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Porto de Destino</label>
-                        <input type="text" id="portoDestino" name="portoDestino" placeholder="Ex: Manaus"
-                               class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
-                    </div>
-                    <div>
-                        <label for="dataInicio" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Data Início (Upload)</label>
-                        <input type="date" id="dataInicio" name="dataInicio"
-                               class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
-                    </div>
-                    <div>
-                        <label for="dataFim" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Data Fim (Upload)</label>
-                        <input type="date" id="dataFim" name="dataFim"
-                               class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
-                    </div>
-                    <div>
-                        <button type="submit" id="btn-exportar"
-                                class="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-slate-950 font-bold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-lg shadow-emerald-500/10 flex items-center justify-center gap-2 text-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                            </svg>
-                            Exportar Excel
-                        </button>
-                    </div>
-                </form>
-            </div>
 
             <!-- Section 2: KPIs (RF12) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -310,7 +275,7 @@
         } else {
             // Mapping responsibilities
             const labelsMap = {
-                'ALIANCA': 'Aliança Navegação',
+                'SISTEMA': 'Sistema Navegação',
                 'CLIENTE': 'Cliente / Tomador',
                 'PENDENTE': 'Investigação Pendente'
             };
@@ -319,7 +284,7 @@
             const valores = responsabilidadeDados.map(item => item.valorTotal);
             
             const backgroundColors = responsabilidadeDados.map(item => {
-                if (item.responsavel === 'ALIANCA') return '#ef4444'; // red-500 (prejuízo nosso)
+                if (item.responsavel === 'SISTEMA') return '#ef4444'; // red-500 (prejuízo nosso)
                 if (item.responsavel === 'CLIENTE') return '#10b981'; // emerald-500 (reembolsável)
                 return '#f59e0b'; // amber-500 (pendente)
             });

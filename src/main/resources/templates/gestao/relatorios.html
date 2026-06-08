@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="pt-BR">
+<head th:replace="~{fragments/layout :: head('Relatórios Consolidados')}">
+    <title>Relatórios Consolidados</title>
+</head>
+<body class="font-body bg-slate-950 min-h-screen text-slate-100">
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <!-- Main Content -->
+    <div class="min-h-screen transition-all duration-300" id="main-content">
+        <!-- Topbar -->
+        <div th:replace="~{fragments/layout :: topbar}"></div>
+
+        <main class="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
+            
+            <!-- Page Title -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="font-display text-2xl lg:text-3xl font-bold bg-gradient-to-r from-slate-50 to-slate-350 bg-clip-text text-transparent">
+                        Relatórios Consolidados
+                    </h1>
+                    <p class="text-slate-400 text-sm mt-1">Consulte a base de dados de CT-es com filtros avançados e exporte para Excel.</p>
+                </div>
+            </div>
+
+            <!-- Filters & Actions Section -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    <h2 class="font-display text-lg font-bold text-slate-50">Filtros de Consulta</h2>
+                </div>
+                <form th:action="@{/relatorios}" method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div>
+                        <label for="portoDestino" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Porto de Destino</label>
+                        <input type="text" id="portoDestino" name="portoDestino" th:value="${portoDestino}" placeholder="Ex: Manaus"
+                               class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
+                    </div>
+                    <div>
+                        <label for="dataInicio" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Data Início (Upload)</label>
+                        <input type="date" id="dataInicio" name="dataInicio" th:value="${dataInicio}"
+                               class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
+                    </div>
+                    <div>
+                        <label for="dataFim" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Data Fim (Upload)</label>
+                        <input type="date" id="dataFim" name="dataFim" th:value="${dataFim}"
+                               class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="submit"
+                                class="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl transition-all duration-200 focus:outline-none border border-slate-700 flex items-center justify-center gap-2 text-sm">
+                            <svg class="w-4 h-4 text-slate-450" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            Filtrar
+                        </button>
+                        <button type="submit" th:formaction="@{/dashboard/exportar}"
+                                class="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-slate-950 font-bold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-lg shadow-emerald-500/10 flex items-center justify-center gap-2 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Exportar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Preview Data Table (RF13) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                        </svg>
+                        <h2 class="font-display text-lg font-bold text-slate-50">Pré-visualização dos Resultados</h2>
+                    </div>
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-slate-800 text-slate-300 border border-slate-700"
+                          th:text="${(ctes != null ? ctes.size() : 0) + ' registros encontrados'}">0 registros</span>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm text-slate-300">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 font-semibold bg-slate-950/40">
+                                <th class="py-3 px-4">Número CT-e</th>
+                                <th class="py-3 px-4">Chave de Acesso</th>
+                                <th class="py-3 px-4">Tomador</th>
+                                <th class="py-3 px-4">Origem / Destino</th>
+                                <th class="py-3 px-4 text-right">Valor CT-e</th>
+                                <th class="py-3 px-4 text-right">Multa Potencial</th>
+                                <th class="py-3 px-4">Booking</th>
+                                <th class="py-3 px-4">Data Upload</th>
+                                <th class="py-3 px-4 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loop over filtered ctes -->
+                            <tr th:each="cte : ${ctes}" class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                                <td class="py-3.5 px-4 font-medium text-slate-100" th:text="${cte.numeroCte ?: 'S/N'}">0001</td>
+                                <td class="py-3.5 px-4">
+                                    <span th:if="${cte.chaveAcesso}" th:text="${cte.chaveAcesso}" class="font-mono text-xs text-amber-500/90 break-all select-all">44-digit-key</span>
+                                    <span th:unless="${cte.chaveAcesso}" class="text-slate-500 italic">Não extraída</span>
+                                </td>
+                                <td class="py-3.5 px-4 font-medium text-slate-200" th:text="${cte.tomadorNome ?: 'N/A'}">TOMADOR S/A</td>
+                                <td class="py-3.5 px-4 text-slate-400">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs text-slate-500 uppercase">DE: <span class="text-slate-350" th:text="${cte.portoOrigem}">ORIGEM</span></span>
+                                        <span class="text-xs text-slate-500 uppercase">PARA: <span class="text-slate-200 font-semibold" th:text="${cte.portoDestino}">DESTINO</span></span>
+                                    </div>
+                                </td>
+                                <td class="py-3.5 px-4 text-right font-medium text-slate-350"
+                                    th:text="${cte.valorCarga != null ? 'R$ ' + #numbers.formatDecimal(cte.valorCarga, 1, 'POINT', 2, 'COMMA') : 'R$ 0,00'}">R$ 0,00</td>
+                                <td class="py-3.5 px-4 text-right font-bold text-amber-500"
+                                    th:text="${'R$ ' + #numbers.formatDecimal(cte.getValorPotencialMulta(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                                <td class="py-3.5 px-4 text-slate-450 font-mono" th:text="${cte.numeroBooking ?: '-'}">B1234</td>
+                                <td class="py-3.5 px-4 text-slate-400" th:text="${#temporals.format(cte.dataUpload, 'dd/MM/yyyy HH:mm')}">01/01/2026</td>
+                                <td class="py-3.5 px-4 text-center">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border"
+                                          th:classappend="${
+                                              cte.status.name() == 'REGISTRADO' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                                              (cte.status.name() == 'AGUARDANDO_DESEMBARACO' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                              (cte.status.name() == 'AUTO_RECEBIDO' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                              (cte.status.name() == 'EM_INVESTIGACAO' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                                              (cte.status.name() == 'AGUARDANDO_PAGAMENTO' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
+                                              (cte.status.name() == 'PAGO' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                              (cte.status.name() == 'ENCERRADO_COM_AUTO' ? 'bg-slate-700/20 text-slate-350 border-slate-700/30' :
+                                              (cte.status.name() == 'ENCERRADO_SEM_AUTO' ? 'bg-slate-700/20 text-emerald-400 border-emerald-800/30' : 'bg-slate-500/10 text-slate-400 border-slate-500/20')))))))}"
+                                          th:text="${cte.status}">STATUS</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(ctes)}">
+                                <td colspan="9" class="py-8 text-center text-slate-500 italic">Nenhum registro encontrado para os filtros informados.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

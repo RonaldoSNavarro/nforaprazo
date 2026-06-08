@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.alianca</groupId>
+    <groupId>com.sistema</groupId>
     <artifactId>nforaprazo</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>nforaprazo</name>

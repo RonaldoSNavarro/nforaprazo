@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md — Sistema NF Fora do Prazo
-> Status: 🟢 FASE 5 CONCLUÍDA
-> Fase atual: **FASE 6 — Go-Live (iniciando)**
-> Última atualização: 2026-06-06 | Atualizado por: CTO Agent
+> Status: 🟢 FASE 6 CONCLUÍDA
+> Fase atual: **Fases Completas — Pronto para Homologação**
+> Última atualização: 2026-06-08 | Atualizado por: PM Agent
 > Para requisitos detalhados, consulte: REQUIREMENTS.md
  
 ---
@@ -25,7 +25,7 @@ Deploy:     VPS Ubuntu 24 + Docker + Nginx (produção)
 ## 2. ESTRUTURA DO PROJETO
  
 ```
-com.alianca.nforaprazo
+com.sistema.nforaprazo
 ├── config/       SecurityConfig, MailConfig, FileStorageConfig
 ├── controller/   Um por recurso — sem lógica de negócio
 ├── service/      Toda a lógica de negócio aqui
@@ -61,7 +61,7 @@ com.alianca.nforaprazo
 [🟢] Fase 3 — Auto de Infração  (Semanas 10-11) → CONCLUÍDA (Investigação e Notificações)
 [🟢] Fase 4 — Sem Auto + Nota   (Semanas 12-13) → CONCLUÍDA (Faturamento e DTO Validation)
 [🟢] Fase 5 — Dashboard         (Semanas 14-16) → CONCLUÍDA
-[🟡] Fase 6 — Go-Live           (Semanas 17-18) → em andamento
+[🟢] Fase 6 — Go-Live           (Semanas 17-18) → CONCLUÍDA (Portos Dinâmicos e Refatoração Global)
 ```
  
 ### Entregáveis da Fase 0 (CONCLUÍDA)
@@ -120,7 +120,19 @@ com.alianca.nforaprazo
 - [x] Troca Obrigatória de Senha — Bloqueio e redirecionamento de URLs operacionais caso o usuário logado esteja com flag de alteração ativa.
 - [x] Trilha de Auditoria via Spring AOP — Aspecto customizado @Auditable interceptando e persistindo ações e parâmetros de entrada (com ocultação de senhas) no banco.
 - [x] Observabilidade de Saúde — Integração com o Spring Boot Actuator exposto nas rotas /actuator/health e /actuator/metrics protegidas via RBAC.
- 
+
+### Entregáveis da Fase 6 (CONCLUÍDA)
+- [x] Criação da tabela `porto_monitorado` na base de dados (`V1__create_usuarios.sql`)
+- [x] Nova entidade `PortoMonitorado.java` e repositório `PortoMonitoradoRepository.java`
+- [x] CRUD e painel administrativo dinâmico de portos monitorados em `/admin/portos`
+- [x] Substituição total das referências a "alianca" e "aliança" em todo o código-fonte, DTOs, migrations, pom.xml, Dockerfile, docker-compose.yml e templates HTML
+- [x] Refatoração do pacote principal Java para `com.sistema.nforaprazo`
+- [x] Correção e execução de toda a suíte de testes com 39 testes com sucesso
+- [x] Reconstrução da imagem Docker e deploy bem-sucedido via Docker Compose com verificação de health check (status healthy)
+- [x] Correção de vazamento de credenciais ocultando a senha de `Usuario.java` no `toString()` do Lombok
+- [x] Remoção do método depreciado/hardcoded `isPortoMonitorado()` de `Cte.java` e atualização de testes associados
+- [x] Otimização do filtro de segurança `ForcarSenhaFiltro.java` para cachear a flag `alterarSenha` em `CustomUserDetails`, reduzindo queries recorrentes no banco de dados
+
 ---
  
 ## 5. DECISÕES TÉCNICAS (ADRs)
@@ -165,7 +177,8 @@ Nomenclatura: Classes PascalCase PT-BR | Métodos camelCase PT-BR | Migrations V
 | Fase 3 | 2026-06-05 | Investigação DOCS_FISCAL, Notificações EmailService, Logs de Alertas |
 | Fase 4 | 2026-06-05 | Encerramento Sem Auto, Emissão de Notas de Débito, Validação Bean Validation com DTOs |
 | Fase 5 | 2026-06-06 | Dashboard Executivo, Relatório Excel e Suíte Completa de Testes Automatizados |
- 
+| Fase 6 | 2026-06-08 | Portos Monitorados Dinâmicos, Remoção Global do nome "alianca", docker compose build |
+
 ---
  
 ## 8. PROBLEMAS CONHECIDOS / BLOQUEADORES
@@ -181,9 +194,7 @@ Nomenclatura: Classes PascalCase PT-BR | Métodos camelCase PT-BR | Migrations V
  
 | Prioridade | Ação | Responsável |
 |------------|------|-------------|
-| Alta       | Pesquisa de Requisitos da Fase 3 — Entrevista com equipe TAX | PM / Analista |
-| Alta       | Desenhar novo fluxo de UI para Perfil DOCS_FISCAL e GESTAO | UI/UX |
-| Média      | Modelagem da atribuição de multas (Cliente vs Aliança) na Entidade | Dev / CTO |
+| Baixa      | Homologação e testes de faturamento com usuário real | Todos |
  
 ---
  

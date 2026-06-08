@@ -59,7 +59,7 @@
 
                         <div>
                             <label for="email" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">E-mail de Acesso</label>
-                            <input type="email" id="email" name="email" required placeholder="roberto.silva@alianca.com"
+                            <input type="email" id="email" name="email" required placeholder="roberto.silva@sistema.local"
                                    class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
                         </div>
 
@@ -92,6 +92,7 @@
                                     <th class="pb-3 text-center">Perfil</th>
                                     <th class="pb-3 text-center">Status</th>
                                     <th class="pb-3 text-center">Troca Senha</th>
+                                    <th class="pb-3 text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -112,6 +113,23 @@
                                         <span class="px-2 py-0.5 text-xs rounded"
                                               th:classappend="${usuario.alterarSenha} ? 'bg-amber-500/10 text-amber-400' : 'bg-slate-800 text-slate-500'"
                                               th:text="${usuario.alterarSenha} ? 'Exigida' : 'OK'">Sim</span>
+                                    </td>
+                                    <td class="py-3 text-center flex justify-center gap-2">
+                                        <button type="button" 
+                                                th:data-id="${usuario.id}"
+                                                th:data-nome="${usuario.nome}"
+                                                th:data-perfil="${usuario.perfil}"
+                                                th:data-ativo="${usuario.ativo}"
+                                                onclick="abrirModalEdicao(this)"
+                                                class="p-1.5 text-amber-500 hover:bg-amber-500/10 rounded transition-colors" title="Editar">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                        </button>
+                                        <form th:action="@{/admin/usuarios/excluir}" method="post" onsubmit="return confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.');" class="inline">
+                                            <input type="hidden" name="id" th:value="${usuario.id}">
+                                            <button type="submit" class="p-1.5 text-red-500 hover:bg-red-500/10 rounded transition-colors" title="Excluir">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             </tbody>
@@ -134,6 +152,72 @@
 
         </main>
     </div>
+
+    <!-- Modal Edição -->
+    <div id="modalEdicao" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 shadow-2xl transform scale-95 transition-transform duration-300" id="modalEdicaoContent">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-display font-bold text-slate-50">Editar Usuário</h3>
+                <button type="button" onclick="fecharModalEdicao()" class="text-slate-400 hover:text-slate-200 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <form th:action="@{/admin/usuarios/editar}" method="post" class="space-y-4">
+                <input type="hidden" id="edit-id" name="id">
+                
+                <div>
+                    <label for="edit-nome" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Nome Completo</label>
+                    <input type="text" id="edit-nome" name="nome" required 
+                           class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
+                </div>
+                
+                <div>
+                    <label for="edit-perfil" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Perfil</label>
+                    <select id="edit-perfil" name="perfil" required 
+                            class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm">
+                        <option th:each="p : ${perfis}" th:value="${p}" th:text="${p}"></option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2 mt-4 bg-slate-950 p-3 rounded-xl border border-slate-700/50">
+                    <input type="checkbox" id="edit-ativo" name="ativo" value="true" class="w-4 h-4 text-amber-500 bg-slate-900 border-slate-600 rounded focus:ring-amber-500 focus:ring-2">
+                    <label for="edit-ativo" class="text-sm font-medium text-slate-300">Usuário Ativo (Pode acessar o sistema)</label>
+                </div>
+                
+                <div class="pt-4 flex gap-3 justify-end">
+                    <button type="button" onclick="fecharModalEdicao()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-colors">Cancelar</button>
+                    <button type="submit" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-sm font-bold transition-colors">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        function abrirModalEdicao(btn) {
+            document.getElementById('edit-id').value = btn.dataset.id;
+            document.getElementById('edit-nome').value = btn.dataset.nome;
+            document.getElementById('edit-perfil').value = btn.dataset.perfil;
+            document.getElementById('edit-ativo').checked = (btn.dataset.ativo === 'true');
+            
+            const modal = document.getElementById('modalEdicao');
+            const content = document.getElementById('modalEdicaoContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+        
+        function fecharModalEdicao() {
+            const modal = document.getElementById('modalEdicao');
+            const content = document.getElementById('modalEdicaoContent');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+    </script>
 
     <!-- Scripts -->
     <div th:replace="~{fragments/layout :: scripts}"></div>

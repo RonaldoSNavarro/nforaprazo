@@ -13,7 +13,7 @@
 | RF04  | Notificação    | Alta       | E-mails automáticos por Spring Mail em cada transição de status relevante |
 | RF05  | Auto Infração  | Alta       | Upload do PDF do auto de infração vinculado ao CT-e com data emissão e vencimento |
 | RF06  | Auto Infração  | Alta       | Alerta automático ao DOCS_FISCAL após registro do auto |
-| RF07  | Investigação   | Alta       | Campos para DOCS_FISCAL: responsável (ALIANCA/CLIENTE), motivo, ticket/evidência — BLOQUEANTE para avançar |
+| RF07  | Investigação   | Alta       | Campos para DOCS_FISCAL: responsável (SISTEMA/CLIENTE), motivo, ticket/evidência — BLOQUEANTE para avançar |
 | RF08  | Pagamento      | Alta       | Upload de DAR + comprovante + capa; registro do valor efetivamente pago |
 | RF09  | Pagamento      | Alta       | Alerta ao FATURAMENTO após pagamento confirmado |
 | RF10  | Encerramento   | Alta       | FATURAMENTO registra nota de débito → status ENCERRADO_COM_AUTO |
@@ -44,7 +44,7 @@
 ```
 RN01: valor_multa = 10% do SOMATÓRIO dos valores de todas as NFs do CT-e
 RN02: valor_nota_debito = valor_pago (NÃO valor_multa) — pode ter desconto por antecipação
-RN03: responsavel = ALIANCA → empresa absorve | responsavel = CLIENTE → emite nota de débito
+RN03: responsavel = SISTEMA → empresa absorve | responsavel = CLIENTE → emite nota de débito
 RN04: Nota de débito SOMENTE pode ser emitida após arquivo_comprovante estar preenchido em Pagamento
 RN05: Portos que disparam alerta DESCARGA: Manaus, Vila do Conde/PCM, Pecém
       Demais portos: apenas registrar, sem alerta (desembaraço é responsabilidade do cliente)
@@ -79,7 +79,7 @@ LogAlerta        → id | cte_inclusao_id(FK) | tipo_alerta | destinatario | dat
 PerfilUsuario:  FATURAMENTO | DESCARGA | DOCS_FISCAL | GESTAO
 StatusCTe:      REGISTRADO | AGUARDANDO_DESEMBARACO | AUTO_RECEBIDO | EM_INVESTIGACAO
                 AGUARDANDO_PAGAMENTO | PAGO | ENCERRADO_COM_AUTO | ENCERRADO_SEM_AUTO
-Responsavel:    ALIANCA | CLIENTE | PENDENTE
+Responsavel:    SISTEMA | CLIENTE | PENDENTE
 StatusEnvio:    ENVIADO | ERRO
 ```
  
@@ -106,7 +106,7 @@ FISCAL: upload auto → AUTO_RECEBIDO → e-mail DOCS_FISCAL
 DOCS: define responsável + motivo + ticket → EM_INVESTIGACAO → AGUARDANDO_PAGAMENTO → e-mail DESCARGA
 DESCARGA: paga (externo) + upload DAR+comprovante+capa → PAGO → e-mail FATURAMENTO
 FATURAMENTO: se CLIENTE → nota de débito → ENCERRADO_COM_AUTO
-             se ALIANCA → ENCERRADO_COM_AUTO (sem nota de débito)
+             se SISTEMA → ENCERRADO_COM_AUTO (sem nota de débito)
 ```
  
 ### Fluxo B — Sem auto de infração

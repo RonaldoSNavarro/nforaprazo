@@ -15,7 +15,7 @@ Participante 2  (01:02)
 A gente tem uma como é destino Manaus. É destino Manaus. Tem multa pra inclusão de nota fora do prazo, né? 
 
 Participante 2  (01:11)
-Uma multa de 10% sobre o valor total da nota. Ah, se é a culpa foi da aliança, que é quando o cliente lhe envia a nota fiscal, e a gente que por alguma falha interna, não não incluía essa nota lá no início da operação, né, a aliança subiu custo e tal não é não acontece nada, agora se o erro for do cliente se o cliente que não enviou a rota fiscal pra gente, ele não cumpriu a partida do contrato aí a gente cobra a gente paga essa multa pra ser fácil, porque ela vem na nossa inscrição estadual? 
+Uma multa de 10% sobre o valor total da nota. Ah, se é a culpa foi da sistema, que é quando o cliente lhe envia a nota fiscal, e a gente que por alguma falha interna, não não incluía essa nota lá no início da operação, né, a sistema subiu custo e tal não é não acontece nada, agora se o erro for do cliente se o cliente que não enviou a rota fiscal pra gente, ele não cumpriu a partida do contrato aí a gente cobra a gente paga essa multa pra ser fácil, porque ela vem na nossa inscrição estadual? 
 
 Participante 1  (01:42)
 O escov do clima. 
@@ -153,7 +153,7 @@ Participante 2  (10:05)
 Também? Também? Não tem problema, tá? 
 
 Participante 2  (10:08)
-Mas eles têm que eles têm que preencher ali, ou seja, eles têm que ter um campo de motivo ação tem que informar ali. O que aconteceu, né, quando eles fizerem isso depois que eles fizerem, essa ação é a gente tem que receber um novo alerta, ou seja, a gente tem que receber oh, o time e tal já justificou o erro por quê? Porque só depois que eles justificarem o erro e falarem quem foi o causador, se foi equipe, aliança ou se foi o cliente que a gente pode enviar o alto pra pagar. 
+Mas eles têm que eles têm que preencher ali, ou seja, eles têm que ter um campo de motivo ação tem que informar ali. O que aconteceu, né, quando eles fizerem isso depois que eles fizerem, essa ação é a gente tem que receber um novo alerta, ou seja, a gente tem que receber oh, o time e tal já justificou o erro por quê? Porque só depois que eles justificarem o erro e falarem quem foi o causador, se foi equipe, sistema ou se foi o cliente que a gente pode enviar o alto pra pagar. 
 
 Participante 2  (10:39)
 Entendi. Entendeu, ahn, às vezes A gente consegue identificar isso antes, porque o próprio cliente já informa ó, eu enviei a documentação nesse e-mail aqui, então, mas mesmo assim a gente tem que ter a? Validação do time de emissão. 
@@ -162,7 +162,7 @@ Participante 2  (10:52)
 Então por isso que tem que é importante ter essa etapa tem que ter essa etapa. Né, aí, beleza? A gente recebeu o alerta que a gente pode enviar o autopropagamento. 
 
 Participante 2  (11:02)
-Aí a gente vai de novo. Tem que ir, tem todo um processo que é feito fora do nosso sistema aliança é no portal da cefase, não tem como integrar isso, então isso tem que ser manual, então beleza. A gente fez esse processo de envio pra pagamento aí, enviemos, propagamento, aí a gente enjoa, o pagamento, beleza, tudo tu tu temos lá os arquivos, a gente volta nesse app e a anex a arquivo, por quê? 
+Aí a gente vai de novo. Tem que ir, tem todo um processo que é feito fora do nosso sistema sistema é no portal da cefase, não tem como integrar isso, então isso tem que ser manual, então beleza. A gente fez esse processo de envio pra pagamento aí, enviemos, propagamento, aí a gente enjoa, o pagamento, beleza, tudo tu tu temos lá os arquivos, a gente volta nesse app e a anex a arquivo, por quê? 
 
 Participante 2  (11:30)
 Porque quando a gente enviou o alto para pagamento, eles geram dar um DR, né, é um boleto e a gente também tem? 
@@ -201,7 +201,7 @@ Participante 2  (12:21)
 Depois que a gente faz isso, a gente tem que anexar isso dentro dessa plataforma, entendeu, porque ali já consta o valor que a gente pagou naquele boleto, né? Sim, e aí também ali já voltam o app já voltam alerta? Pro time do faturamento falando, oh, o time de manifesto que é a descarga já concluiu o pagamento e tal é agora se for necessário, né? 
 
 Participante 2  (12:49)
-Se não for erro aliança, você já podem emitir a nota de débito cobrando o cliente. Então aí assim que eles emitirem a nota de débito, eles vão enviar lá pro cliente, ele emitiram a nota de débito, eles voltam dentro desse sistema, falando, tá aqui a nota de débito, a gente já enviou pro cliente, então ali fechou o processo. Fechou, finalizou. 
+Se não for erro sistema, você já podem emitir a nota de débito cobrando o cliente. Então aí assim que eles emitirem a nota de débito, eles vão enviar lá pro cliente, ele emitiram a nota de débito, eles voltam dentro desse sistema, falando, tá aqui a nota de débito, a gente já enviou pro cliente, então ali fechou o processo. Fechou, finalizou. 
 
 Participante 1  (13:10)
 Certo, é? 

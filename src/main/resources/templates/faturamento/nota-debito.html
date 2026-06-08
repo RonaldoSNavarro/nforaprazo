@@ -51,7 +51,7 @@
                                     <span class="px-2.5 py-1 rounded-full text-xs font-medium border"
                                           th:classappend="${
                                               cte.autoInfracao.responsavel.name() == 'CLIENTE' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                                              (cte.autoInfracao.responsavel.name() == 'ALIANCA' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20')}"
+                                              (cte.autoInfracao.responsavel.name() == 'SISTEMA' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20')}"
                                           th:text="${cte.autoInfracao.responsavel}">RESPONSÁVEL</span>
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-50" th:text="'R$ ' + ${#numbers.formatDecimal(cte.autoInfracao.pagamento.valorPago, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
@@ -65,8 +65,8 @@
                                         Emitir Nota de Débito
                                     </button>
 
-                                    <!-- Ação 2: Aliança paga (Custo absorvido sem cobrança) -->
-                                    <form th:if="${cte.autoInfracao.responsavel.name() == 'ALIANCA'}" 
+                                    <!-- Ação 2: Sistema paga (Custo absorvido sem cobrança) -->
+                                    <form th:if="${cte.autoInfracao.responsavel.name() == 'SISTEMA'}" 
                                           th:action="@{/faturamento/encerrar-custo-absorvido}" method="post" class="inline">
                                         <input type="hidden" name="cteId" th:value="${cte.id}">
                                         <button type="submit" 

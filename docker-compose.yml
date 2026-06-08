@@ -11,6 +11,11 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:postgresql://host.docker.internal:5432/nfora_prazo_dev}
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-dev}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASS: ${MAIL_PASS}
+      MAIL_SSL_TRUST: ${MAIL_SSL_TRUST:-*}
       FILE_UPLOAD_DIR: /app/uploads
     volumes:
       - uploads:/app/uploads
@@ -21,4 +26,3 @@ services:
 volumes:
   uploads:
     driver: local
-

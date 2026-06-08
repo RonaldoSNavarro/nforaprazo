@@ -18,3 +18,11 @@ CREATE TABLE usuarios (
 
 CREATE INDEX idx_usuarios_email ON usuarios(email);
 CREATE INDEX idx_usuarios_perfil ON usuarios(perfil);
+
+CREATE TABLE porto_monitorado (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    nome VARCHAR(100) NOT NULL UNIQUE,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    criado_por VARCHAR(255) NOT NULL,
+    data_criacao TIMESTAMP NOT NULL DEFAULT NOW()
+);
