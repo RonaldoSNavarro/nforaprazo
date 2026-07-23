@@ -12,7 +12,7 @@
         <main class="p-6 lg:p-8">
             <div class="mb-8">
                 <h1 class="font-display text-2xl font-bold text-slate-50">Upload de CT-e Complementar</h1>
-                <p class="text-slate-400 mt-1">Envie o arquivo PDF original do conhecimento de transporte.</p>
+                <p class="text-slate-400 mt-1">Envie o arquivo PDF original do conhecimento de transporte e os dados complementares.</p>
             </div>
 
             <!-- Alertas -->
@@ -21,20 +21,20 @@
                 <span th:text="${erro}">Mensagem de erro aqui</span>
             </div>
 
-            <div class="max-w-2xl bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-xl shadow-black/20">
+            <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-xl shadow-black/20">
                 <div class="p-6">
                     <form th:action="@{/cte/upload}" method="post" enctype="multipart/form-data" id="uploadForm">
                         
                         <!-- Drag & Drop Area -->
                         <div class="w-full relative group">
-                            <label for="arquivoCte" class="flex flex-col items-center justify-center w-full h-64 border-2 border-slate-600 border-dashed rounded-xl cursor-pointer bg-slate-900/50 hover:bg-slate-800 hover:border-amber-500/50 transition-all">
+                            <label for="arquivoCte" class="flex flex-col items-center justify-center w-full h-56 border-2 border-slate-600 border-dashed rounded-xl cursor-pointer bg-slate-900/50 hover:bg-slate-800 hover:border-amber-500/50 transition-all">
                                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <div class="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                        <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="w-14 h-14 rounded-full bg-amber-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                        <svg class="w-7 h-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                         </svg>
                                     </div>
-                                    <p class="mb-2 text-sm text-slate-300"><span class="font-semibold text-amber-500">Clique para selecionar</span> ou arraste o PDF</p>
+                                    <p class="mb-1 text-sm text-slate-300"><span class="font-semibold text-amber-500">Clique para selecionar</span> ou arraste o PDF do CT-e</p>
                                     <p class="text-xs text-slate-500">Apenas arquivos .PDF (Max. 10MB)</p>
                                 </div>
                                 <input id="arquivoCte" name="arquivoCte" type="file" class="hidden" accept=".pdf" required onchange="updateFileName(this)" />
@@ -42,15 +42,21 @@
                         </div>
                         
                         <!-- File Info Display -->
-                        <div id="fileInfo" class="hidden mt-4 p-4 rounded-xl bg-slate-900/50 border border-slate-700 flex items-center gap-3">
-                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                            <div class="flex-1 min-w-0">
-                                <p id="fileNameDisplay" class="text-sm font-medium text-slate-200 truncate">arquivo.pdf</p>
-                                <p class="text-xs text-slate-500">Pronto para upload</p>
+                        <div id="fileInfo" class="hidden mt-4 p-4 rounded-xl bg-slate-900/50 border border-slate-700 flex flex-col gap-2">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                <div class="flex-1 min-w-0">
+                                    <p id="fileNameDisplay" class="text-sm font-medium text-slate-200 truncate">arquivo.pdf</p>
+                                    <p class="text-xs text-slate-500">PDF do CT-e Selecionado</p>
+                                </div>
+                            </div>
+                            <div id="extractionStatus" class="hidden flex items-center gap-2 text-xs text-amber-400 font-medium animate-pulse pt-1 border-t border-slate-800">
+                                <svg class="w-4 h-4 animate-spin text-amber-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Lendo PDF e preenchendo formulário automaticamente...
                             </div>
                         </div>
 
-                        <!-- Dados do CT-e (Preenchimento Manual - ADR-001) -->
+                        <!-- Dados do CT-e -->
                         <div class="mt-6 border-t border-slate-700 pt-6">
                             <h3 class="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -58,52 +64,81 @@
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="numeroCte" class="block text-xs font-medium text-slate-400 mb-1">Número do CT-e</label>
-                                    <input type="text" id="numeroCte" name="numeroCte" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all placeholder-slate-600" placeholder="Ex: 12345"/>
+                                    <label for="numeroCte" class="block text-xs font-medium text-slate-400 mb-1">Número do CT-e *</label>
+                                    <input type="text" id="numeroCte" name="numeroCte" required class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Ex: 12345"/>
                                 </div>
                                 <div>
-                                    <label for="numeroBooking" class="block text-xs font-medium text-slate-400 mb-1">Nº Booking</label>
-                                    <input type="text" id="numeroBooking" name="numeroBooking" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all placeholder-slate-600" placeholder="Ex: BK20260001"/>
+                                    <label for="numeroBooking" class="block text-xs font-medium text-slate-400 mb-1">Nº Booking *</label>
+                                    <input type="text" id="numeroBooking" name="numeroBooking" required class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Ex: BK20260001"/>
                                 </div>
                                 <div>
-                                    <label for="tomadorNome" class="block text-xs font-medium text-slate-400 mb-1">Tomador (Nome)</label>
-                                    <input type="text" id="tomadorNome" name="tomadorNome" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Razão social do tomador"/>
+                                    <label for="tomadorNome" class="block text-xs font-medium text-slate-400 mb-1">Tomador (Nome) *</label>
+                                    <input type="text" id="tomadorNome" name="tomadorNome" required class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Razão social do tomador"/>
                                 </div>
                                 <div>
-                                    <label for="tomadorCnpj" class="block text-xs font-medium text-slate-400 mb-1">Tomador (CNPJ)</label>
-                                    <input type="text" id="tomadorCnpj" name="tomadorCnpj" maxlength="18" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="00.000.000/0001-00"/>
+                                    <label for="tomadorCnpj" class="block text-xs font-medium text-slate-400 mb-1">Tomador (CNPJ) *</label>
+                                    <input type="text" id="tomadorCnpj" name="tomadorCnpj" required maxlength="18" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="00.000.000/0001-00"/>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="navioViagemDirecao" class="block text-xs font-medium text-slate-400 mb-1">Navio / Viagem / Direção *</label>
+                                    <input type="text" id="navioViagemDirecao" name="navioViagemDirecao" required class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Ex: LOG-IN AMAZONAS / 042N / NORTE"/>
                                 </div>
                                 <div>
-                                    <label for="navio" class="block text-xs font-medium text-slate-400 mb-1">Navio</label>
-                                    <input type="text" id="navio" name="navio" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Nome do navio"/>
+                                    <label for="container" class="block text-xs font-medium text-slate-400 mb-1">Container (4 letras e 7 números)</label>
+                                    <input type="text" id="container" name="container" maxlength="11" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all uppercase" placeholder="Ex: MSKU1234567"/>
+                                    <p class="text-[10px] text-slate-500 mt-1">Extraído automaticamente do campo Observações se colado abaixo</p>
                                 </div>
                                 <div>
-                                    <label for="viagem" class="block text-xs font-medium text-slate-400 mb-1">Viagem</label>
-                                    <input type="text" id="viagem" name="viagem" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Código da viagem"/>
+                                    <label for="quantidadeNotas" class="block text-xs font-medium text-slate-400 mb-1">Qtd. de NFs Incluídas no CT-e</label>
+                                    <input type="number" id="quantidadeNotas" name="quantidadeNotas" min="1" step="1" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Ex: 1"/>
                                 </div>
                                 <div>
-                                    <label for="portoOrigem" class="block text-xs font-medium text-slate-400 mb-1">Porto de Origem</label>
-                                    <input type="text" id="portoOrigem" name="portoOrigem" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Ex: Santos"/>
+                                    <label for="valorCarga" class="block text-xs font-medium text-slate-400 mb-1">Valor do CT-e / Valor da NF-e (Valor Total Carga R$) *</label>
+                                    <input type="number" id="valorCarga" name="valorCarga" required step="0.01" min="0" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="0,00"/>
                                 </div>
                                 <div>
-                                    <label for="portoDestino" class="block text-xs font-medium text-slate-400 mb-1">Porto de Destino</label>
-                                    <input type="text" id="portoDestino" name="portoDestino" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Ex: Manaus"/>
-                                    <p class="text-xs text-slate-500 mt-1">Manaus, PCM e Pecém geram alerta automático</p>
+                                    <label for="portoOrigem" class="block text-xs font-medium text-slate-400 mb-1">Porto de Origem *</label>
+                                    <input type="text" id="portoOrigem" name="portoOrigem" required class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Ex: Santos"/>
                                 </div>
                                 <div>
-                                    <label for="valorCarga" class="block text-xs font-medium text-slate-400 mb-1">Valor do CT-e (R$)</label>
-                                    <input type="number" id="valorCarga" name="valorCarga" step="0.01" min="0" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="0,00"/>
+                                    <label for="portoDestino" class="block text-xs font-medium text-slate-400 mb-1">Porto de Destino *</label>
+                                    <input type="text" id="portoDestino" name="portoDestino" required class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Ex: Manaus"/>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="observacoes" class="block text-xs font-medium text-slate-400 mb-1">Observações do CT-e</label>
+                                    <textarea id="observacoes" rows="2" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 transition-all" placeholder="Cole aqui as observações do CT-e para extração do container..." oninput="extractContainerFromObs(this.value)"></textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Submit Section -->
+                        <!-- Modal Trigger Section -->
                         <div class="mt-8 flex items-center justify-between border-t border-slate-700 pt-6">
-                            <p class="text-xs text-slate-400">A integridade do arquivo sera validada no servidor.</p>
-                            <button type="submit" id="submitBtn" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                Fazer Upload
+                            <p class="text-xs text-slate-400">Ao prosseguir, será solicitada a Autorização de Aceitação de Custo.</p>
+                            <button type="button" onclick="openAutorizacaoModal()" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-semibold rounded-xl transition-all shadow-lg shadow-amber-500/10">
+                                Avançar & Anexar Autorização
                             </button>
                         </div>
+
+                        <!-- Modal de Autorização de Aceitação de Custo -->
+                        <div id="modalAutorizacao" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-lg shadow-2xl relative">
+                                <h3 class="text-lg font-bold text-slate-50 mb-2 font-display">Autorização de Aceitação de Custo</h3>
+                                <p class="text-xs text-slate-400 mb-6">É obrigatório anexar o arquivo de e-mail ou PDF referente à autorização de custos para prosseguir com o upload do CT-e.</p>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-xs font-medium text-slate-300 mb-2">Arquivo de Autorização (PDF ou E-mail) *</label>
+                                    <input type="file" id="arquivoAutorizacaoCusto" name="arquivoAutorizacaoCusto" accept=".pdf,.eml,.msg" required class="w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500/10 file:text-amber-400 hover:file:bg-amber-500/20 bg-slate-900/50 border border-slate-700 rounded-xl cursor-pointer">
+                                </div>
+
+                                <div class="flex justify-end gap-3 border-t border-slate-700/50 pt-4">
+                                    <button type="button" onclick="closeAutorizacaoModal()" class="px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg transition-colors">Cancelar</button>
+                                    <button type="submit" id="submitBtn" class="px-5 py-2 text-sm font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg transition-colors">
+                                        Confirmar & Fazer Upload
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                     </form>
                 </div>
             </div>
@@ -115,17 +150,76 @@
         function updateFileName(input) {
             const display = document.getElementById('fileInfo');
             const name = document.getElementById('fileNameDisplay');
-            const btn = document.getElementById('submitBtn');
             
             if (input.files && input.files[0]) {
                 name.textContent = input.files[0].name;
                 display.classList.remove('hidden');
+                processarLeituraPdf(input.files[0]);
             } else {
                 display.classList.add('hidden');
             }
         }
+
+        async function processarLeituraPdf(file) {
+            const statusBox = document.getElementById('extractionStatus');
+            if (statusBox) statusBox.classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('arquivoCte', file);
+
+            const csrfToken = document.querySelector("input[name='_csrf']")?.value;
+
+            try {
+                const response = await fetch('/cte/extrair-dados', {
+                    method: 'POST',
+                    headers: csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {},
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.numeroCte) document.getElementById('numeroCte').value = data.numeroCte;
+                    if (data.numeroBooking) document.getElementById('numeroBooking').value = data.numeroBooking;
+                    if (data.tomadorNome) document.getElementById('tomadorNome').value = data.tomadorNome;
+                    if (data.tomadorCnpj) document.getElementById('tomadorCnpj').value = data.tomadorCnpj;
+                    if (data.navioViagemDirecao) document.getElementById('navioViagemDirecao').value = data.navioViagemDirecao;
+                    if (data.container) document.getElementById('container').value = data.container;
+                    if (data.quantidadeNotas) document.getElementById('quantidadeNotas').value = data.quantidadeNotas;
+                    if (data.valorCarga) document.getElementById('valorCarga').value = data.valorCarga;
+                    if (data.observacoes) document.getElementById('observacoes').value = data.observacoes;
+                }
+            } catch (e) {
+                console.warn('Extração automática falhou:', e);
+            } finally {
+                if (statusBox) statusBox.classList.add('hidden');
+            }
+        }
+
+        function extractContainerFromObs(text) {
+            if (!text) return;
+            const containerRegex = /[A-Z]{4}\d{7}/i;
+            const match = text.match(containerRegex);
+            if (match) {
+                const containerInput = document.getElementById('container');
+                if (!containerInput.value) {
+                    containerInput.value = match[0].toUpperCase();
+                }
+            }
+        }
+
+        function openAutorizacaoModal() {
+            const form = document.getElementById('uploadForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            document.getElementById('modalAutorizacao').classList.remove('hidden');
+        }
+
+        function closeAutorizacaoModal() {
+            document.getElementById('modalAutorizacao').classList.add('hidden');
+        }
         
-        // Form submit handler to disable button
         document.getElementById('uploadForm').addEventListener('submit', function() {
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-slate-950 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Enviando...';

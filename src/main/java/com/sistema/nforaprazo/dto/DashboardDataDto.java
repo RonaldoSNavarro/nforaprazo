@@ -11,7 +11,7 @@ public class DashboardDataDto {
     private BigDecimal exposicaoTotal;
     private BigDecimal multasPagas;
     private BigDecimal multasEvitadas;
-    private List<AutoInfracaoMensalProjection> evolucaoMensal;
-    private List<ResponsabilidadeProjection> responsabilidade;
-    private List<ReincidenteProjection> reincidentes;
+    private List<AutoInfracaoMensalDto> evolucaoMensal;
+    private List<ResponsabilidadeDto> responsabilidade;
+    private List<ReincidenteDto> reincidentes;
 }

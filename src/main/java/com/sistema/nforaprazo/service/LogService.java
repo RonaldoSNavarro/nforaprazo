@@ -88,6 +88,7 @@ public class LogService {
 
     @Transactional(readOnly = true)
     public Page<LogAtividade> filtrarPorUsuario(String email, Pageable pageable) {
-        return logAtividadeRepository.findByUsuarioEmailContainingIgnoreCaseOrderByDataCriacaoDesc(email, pageable);
+        String sanitizedEmail = email != null ? email.replace("%", "\\%").replace("_", "\\_") : "";
+        return logAtividadeRepository.findByUsuarioEmailContainingIgnoreCaseOrderByDataCriacaoDesc(sanitizedEmail, pageable);
     }
 }

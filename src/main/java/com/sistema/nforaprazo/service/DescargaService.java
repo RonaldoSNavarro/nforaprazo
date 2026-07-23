@@ -29,12 +29,21 @@ public class DescargaService {
     private final EncSemAutoRepository encSemAutoRepository;
     private final UsuarioRepository usuarioRepository;
     private final StorageService storageService;
+    private final PdfExtractionService pdfExtractionService;
     private final EmailService emailService;
+
+    @org.springframework.beans.factory.annotation.Value("${file.upload-dir:uploads}")
+    private String uploadDir;
 
     @Transactional
     @Auditable(acao = "Confirmacao de Desembaraco")
     public Cte confirmarDesembaraco(UUID cteId, String emailUsuario) {
-        Cte cte = buscarCteEValidarStatus(cteId, StatusCte.AGUARDANDO_DESEMBARACO);
+        Cte cte = cteRepository.findById(cteId)
+                .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));
+
+        if (cte.getStatus() != StatusCte.PENDENTE && cte.getStatus() != StatusCte.AGUARDANDO_DESEMBARACO) {
+            throw new IllegalStateException("Operação inválida para o status atual do CT-e: " + cte.getStatus());
+        }
         cte.setStatus(StatusCte.DESEMBARACADO);
         log.info("CT-e {} marcado como DESEMBARACADO por {}", cteId, emailUsuario);
         return cteRepository.save(cte);
@@ -43,7 +52,12 @@ public class DescargaService {
     @Transactional
     @Auditable(acao = "Registro de Auto de Infracao")
     public AutoInfracao registrarAutoInfracao(AutoInfracaoRequest request, String emailUsuario) {
-        Cte cte = buscarCteEValidarStatus(request.getCteId(), StatusCte.DESEMBARACADO);
+        Cte cte = cteRepository.findById(request.getCteId())
+                .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));
+
+        if (cte.getStatus() != StatusCte.PENDENTE && cte.getStatus() != StatusCte.DESEMBARACADO && cte.getStatus() != StatusCte.REGISTRADO) {
+            throw new IllegalStateException("Operação inválida para o status atual do CT-e: " + cte.getStatus());
+        }
         
         String pathPdf = storageService.store(request.getAutoInfracaoPdf());
         
@@ -82,18 +96,32 @@ public class DescargaService {
 
         String pathDar = storageService.store(request.getDarPdf());
         
+        BigDecimal valorExtraido = null;
+        if (uploadDir != null && pdfExtractionService != null) {
+            try {
+                java.io.File savedDarFile = java.nio.file.Paths.get(uploadDir, pathDar).toFile();
+                valorExtraido = pdfExtractionService.extrairValorPagoDar(savedDarFile);
+            } catch (Exception e) {
+                log.warn("Nao foi possivel extrair valor do DAR: {}", e.getMessage());
+            }
+        }
+
         Pagamento pagamento = auto.getPagamento();
         if (pagamento == null) {
             pagamento = Pagamento.builder()
                     .autoInfracao(auto)
                     .pathDarPdf(pathDar)
+                    .valorPago(valorExtraido)
                     .usuarioRegistro(usuario)
                     .build();
         } else {
             pagamento.setPathDarPdf(pathDar);
+            if (valorExtraido != null) {
+                pagamento.setValorPago(valorExtraido);
+            }
         }
         
-        log.info("DAR registrado para CT-e {} por {}", request.getCteId(), emailUsuario);
+        log.info("DAR registrado para CT-e {} por {}. Valor extraído: {}", request.getCteId(), emailUsuario, valorExtraido);
         return pagamentoRepository.save(pagamento);
     }
 
@@ -137,7 +165,12 @@ public class DescargaService {
     @Transactional
     @Auditable(acao = "Encerramento Sem Auto de Infracao")
     public EncSemAuto encerrarSemAuto(EncSemAutoRequest request, String emailUsuario) {
-        Cte cte = buscarCteEValidarStatus(request.getCteId(), StatusCte.DESEMBARACADO);
+        Cte cte = cteRepository.findById(request.getCteId())
+                .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));
+
+        if (cte.getStatus() != StatusCte.PENDENTE && cte.getStatus() != StatusCte.DESEMBARACADO && cte.getStatus() != StatusCte.REGISTRADO) {
+            throw new IllegalStateException("Operação inválida para o status atual do CT-e: " + cte.getStatus());
+        }
 
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário inválido"));

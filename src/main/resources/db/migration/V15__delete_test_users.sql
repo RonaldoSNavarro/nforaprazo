@@ -17,6 +17,6 @@ WHERE email IN (
     'gerente.operacional@sistema.local'
 );
 
--- Insere o usuário Administrador padrão
+-- Insere o usuário Administrador padrão (exigindo alteração de senha no primeiro acesso)
 INSERT INTO usuarios (id, nome, email, senha, perfil, ativo, alterar_senha) VALUES
-(gen_random_uuid(), 'Administrador do Sistema', 'admin@sistema.local', '$2a$10$MHXPHbs/L3xSqQv8.oeMwujgyUqtk7wOCklhd1N9pD/FF4G2IIyfi', 'ADMINISTRADOR', true, false);
+(gen_random_uuid(), 'Administrador do Sistema', 'admin@sistema.local', '$2a$10$MHXPHbs/L3xSqQv8.oeMwujgyUqtk7wOCklhd1N9pD/FF4G2IIyfi', 'ADMINISTRADOR', true, true);

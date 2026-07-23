@@ -117,9 +117,12 @@ class EndToEndIntegrationTest {
         // -------------------------------------------------------------
         MockMultipartFile arquivoPdf = new MockMultipartFile(
                 "arquivoCte", "cte1.pdf", "application/pdf", PDF_CONTENT);
+        MockMultipartFile autorizacaoPdf = new MockMultipartFile(
+                "arquivoAutorizacaoCusto", "autorizacao.pdf", "application/pdf", PDF_CONTENT);
 
         mockMvc.perform(multipart("/cte/upload")
                         .file(arquivoPdf)
+                        .file(autorizacaoPdf)
                         .param("numeroCte", "9901")
                         .param("tomadorNome", "Tomador Teste")
                         .param("tomadorCnpj", "00.000.000/0001-00")
@@ -134,13 +137,13 @@ class EndToEndIntegrationTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/cte/lista"));
 
-        // Validar no banco que foi salvo como AGUARDANDO_DESEMBARACO
+        // Validar no banco que foi salvo como PENDENTE
         Cte cte = cteRepository.findAll().stream()
                 .filter(c -> c.getNumeroCte().equals("9901"))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("CT-e não encontrado"));
 
-        assertEquals(StatusCte.AGUARDANDO_DESEMBARACO, cte.getStatus());
+        assertEquals(StatusCte.PENDENTE, cte.getStatus());
         java.util.List<String> portosAtivos = portoMonitoradoRepository.findByAtivoTrue().stream()
                 .map(PortoMonitorado::getNome)
                 .toList();
@@ -297,9 +300,12 @@ class EndToEndIntegrationTest {
         // -------------------------------------------------------------
         MockMultipartFile arquivoPdf = new MockMultipartFile(
                 "arquivoCte", "cte2.pdf", "application/pdf", PDF_CONTENT);
+        MockMultipartFile autorizacaoPdf = new MockMultipartFile(
+                "arquivoAutorizacaoCusto", "autorizacao2.pdf", "application/pdf", PDF_CONTENT);
 
         mockMvc.perform(multipart("/cte/upload")
                         .file(arquivoPdf)
+                        .file(autorizacaoPdf)
                         .param("numeroCte", "9902")
                         .param("tomadorNome", "Tomador Teste 2")
                         .param("tomadorCnpj", "00.000.000/0001-00")

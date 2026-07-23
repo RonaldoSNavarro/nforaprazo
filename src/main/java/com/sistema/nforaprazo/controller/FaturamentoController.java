@@ -40,6 +40,16 @@ public class FaturamentoController {
         return "faturamento/nota-debito";
     }
 
+    @GetMapping("/pendentes-pagamento")
+    public String listarAutosPendentesPagamento(@RequestParam(defaultValue = "0") int page, Model model) {
+        Page<Cte> ctes = cteRepository.findByStatusIn(
+                List.of(StatusCte.AGUARDANDO_PAGAMENTO),
+                PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "dataUpload"))
+        );
+        model.addAttribute("ctes", ctes);
+        return "faturamento/pendentes-pagamento";
+    }
+
     @PostMapping("/nota-debito")
     public String emitirNotaDebito(@Valid @ModelAttribute NotaDebitoRequest request,
                                    BindingResult bindingResult,

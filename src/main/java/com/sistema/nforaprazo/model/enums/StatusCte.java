@@ -1,6 +1,7 @@
 package com.sistema.nforaprazo.model.enums;
 
 public enum StatusCte {
+    PENDENTE,
     REGISTRADO,
     AGUARDANDO_DESEMBARACO,
     DESEMBARACADO,

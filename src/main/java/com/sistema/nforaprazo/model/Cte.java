@@ -52,9 +52,24 @@ public class Cte {
     @Column(name = "numero_booking", length = 100)
     private String numeroBooking;
 
+    @Column(name = "quantidade_notas")
+    private Integer quantidadeNotas;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private StatusCte status;
+
+    @Column(name = "container", length = 11)
+    private String container;
+
+    @Column(name = "direcao", length = 100)
+    private String direcao;
+
+    @Column(name = "arquivo_autorizacao_custo_path", length = 255)
+    private String arquivoAutorizacaoCustoPath;
+
+    @Column(name = "nome_original_autorizacao", length = 255)
+    private String nomeOriginalAutorizacao;
 
     @Column(name = "arquivo_pdf_path", nullable = false, length = 255)
     private String arquivoPdfPath;
@@ -96,12 +111,15 @@ public class Cte {
     private NotaDebito notaDebito;
 
     public BigDecimal getValorTotalNotas() {
-        if (notasFiscais == null || notasFiscais.isEmpty()) {
-            return BigDecimal.ZERO;
+        if (notasFiscais != null && !notasFiscais.isEmpty()) {
+            BigDecimal soma = notasFiscais.stream()
+                    .map(nf -> nf.getValorNota() != null ? nf.getValorNota() : BigDecimal.ZERO)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (soma.compareTo(BigDecimal.ZERO) > 0) {
+                return soma;
+            }
         }
-        return notasFiscais.stream()
-                .map(NotaFiscal::getValorNota)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return valorCarga != null ? valorCarga : BigDecimal.ZERO;
     }
 
     public BigDecimal getValorPotencialMulta() {
@@ -130,12 +148,20 @@ public class Cte {
         if (portoDestino == null || portosMonitorados == null) {
             return false;
         }
-        String destino = portoDestino.toUpperCase().trim();
+        String destinoNorm = removerAcentos(portoDestino.toUpperCase().trim());
         for (String porto : portosMonitorados) {
-            if (destino.contains(porto.toUpperCase().trim())) {
+            String portoNorm = removerAcentos(porto.toUpperCase().trim());
+            if (destinoNorm.contains(portoNorm)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private static String removerAcentos(String str) {
+        if (str == null) return "";
+        String nfdNormalizedString = java.text.Normalizer.normalize(str, java.text.Normalizer.Form.NFD);
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(nfdNormalizedString).replaceAll("");
     }
 }

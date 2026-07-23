@@ -39,7 +39,7 @@ public class DocsFiscalController {
         );
 
         model.addAttribute("ctes", pendentes);
-        model.addAttribute("responsaveis", List.of(Responsavel.SISTEMA, Responsavel.CLIENTE));
+        model.addAttribute("responsaveis", List.of(Responsavel.EMPRESA_INTERNO, Responsavel.SISTEMA, Responsavel.CLIENTE));
         return "docs-fiscal/pendentes";
     }
 

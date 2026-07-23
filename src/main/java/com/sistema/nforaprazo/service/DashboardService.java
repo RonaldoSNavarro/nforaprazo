@@ -27,6 +27,8 @@ public class DashboardService {
 
     public DashboardDataDto obterDadosDashboard() {
         List<StatusCte> statusesExposicao = List.of(
+                StatusCte.PENDENTE,
+                StatusCte.REGISTRADO,
                 StatusCte.AGUARDANDO_DESEMBARACO,
                 StatusCte.AUTO_RECEBIDO,
                 StatusCte.EM_INVESTIGACAO,

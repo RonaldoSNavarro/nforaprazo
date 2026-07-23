@@ -78,8 +78,8 @@ public class FaturamentoService {
             throw new IllegalStateException("O processo deve estar PAGO para ser encerrado. Status atual: " + cte.getStatus());
         }
 
-        if (cte.getAutoInfracao() == null || cte.getAutoInfracao().getResponsavel() != Responsavel.SISTEMA) {
-            throw new IllegalStateException("Apenas processos com responsabilidade da SISTEMA podem ser encerrados sem cobrança.");
+        if (cte.getAutoInfracao() == null || (cte.getAutoInfracao().getResponsavel() != Responsavel.SISTEMA && cte.getAutoInfracao().getResponsavel() != Responsavel.EMPRESA_INTERNO)) {
+            throw new IllegalStateException("Apenas processos com responsabilidade Interno/Empresa podem ser encerrados sem cobrança.");
         }
 
         cte.setStatus(StatusCte.ENCERRADO_COM_AUTO);

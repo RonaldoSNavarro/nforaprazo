@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments/layout :: head('Autos Pendentes de Pagamento')}">
+    <title>Autos Analisados e Pendentes de Envio para Pagamento</title>
+</head>
+<body class="font-body bg-slate-950 min-h-screen">
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="min-h-screen transition-all duration-300" id="main-content">
+        <div th:replace="~{fragments/layout :: topbar}"></div>
+
+        <main class="p-6 lg:p-8">
+            <div class="mb-8">
+                <h1 class="font-display text-2xl font-bold text-slate-50">Autos Analisados e Pendentes de Envio Para Pagamento</h1>
+                <p class="text-slate-400 mt-1">Autos de infração investigados aguardando emissão/anexo da guia DAR para pagamento.</p>
+            </div>
+
+            <!-- Card Resumo -->
+            <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-slate-400 uppercase">Qtd. Autos Pendentes</span>
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+                            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                    </div>
+                    <h3 class="text-3xl font-display font-bold text-slate-50" th:text="${ctes.totalElements}">0</h3>
+                    <p class="text-xs text-slate-500 mt-1">Autos aguardando DAR</p>
+                </div>
+            </div>
+
+            <!-- Tabela -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-xl shadow-black/20">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-slate-300">
+                        <thead class="text-xs text-slate-400 uppercase bg-slate-900/50 border-b border-slate-700">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Número do Auto</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Valor do Auto (R$)</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Data Lavratura Auto</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Data Vencimento Auto</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Tomador / CT-e</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Responsabilidade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${ctes.empty}" class="bg-slate-800 border-b border-slate-700/50">
+                                <td colspan="6" class="px-6 py-8 text-center text-slate-500">Nenhum auto pendente de pagamento no momento.</td>
+                            </tr>
+                            
+                            <tr th:each="cte : ${ctes.content}" class="bg-slate-800 border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors">
+                                <td class="px-6 py-4 font-semibold text-amber-400" th:text="${cte.autoInfracao?.numeroAuto ?: 'N/A'}">Auto #12345</td>
+                                <td class="px-6 py-4 font-bold text-slate-100" th:text="${'R$ ' + #numbers.formatDecimal(cte.autoInfracao?.valorMulta ?: 0, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                                <td class="px-6 py-4 text-slate-300" th:text="${cte.autoInfracao?.dataEmissao != null ? #temporals.format(cte.autoInfracao.dataEmissao, 'dd/MM/yyyy') : 'N/A'}">01/01/2026</td>
+                                <td class="px-6 py-4 text-slate-300" th:text="${cte.autoInfracao?.dataVencimento != null ? #temporals.format(cte.autoInfracao.dataVencimento, 'dd/MM/yyyy') : 'N/A'}">15/01/2026</td>
+                                <td class="px-6 py-4">
+                                    <span class="font-medium text-slate-200" th:text="${cte.tomadorNome}">Tomador</span>
+                                    <p class="text-xs text-slate-500 font-mono" th:text="${'CT-e: ' + cte.numeroCte}">CT-e</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold border"
+                                          th:classappend="${cte.autoInfracao?.responsavel?.name() == 'CLIENTE' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}"
+                                          th:text="${cte.autoInfracao?.responsavel?.descricao ?: cte.autoInfracao?.responsavel}">Interno/Empresa</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

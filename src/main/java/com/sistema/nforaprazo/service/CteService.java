@@ -50,8 +50,15 @@ public class CteService {
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
             .orElseThrow(() -> new IllegalArgumentException("Usuario invalido: " + emailUsuario));
 
-        // 1. Salvar arquivo no disco
+        // 1. Salvar arquivos no disco
         String fileName = storageService.store(request.getArquivoCte());
+        
+        String autorizacaoFileName = null;
+        String nomeOriginalAutorizacao = null;
+        if (request.getArquivoAutorizacaoCusto() != null && !request.getArquivoAutorizacaoCusto().isEmpty()) {
+            autorizacaoFileName = storageService.store(request.getArquivoAutorizacaoCusto());
+            nomeOriginalAutorizacao = request.getArquivoAutorizacaoCusto().getOriginalFilename();
+        }
         
         // 2. Extrair dados via PDFBox
         File savedPdf = Paths.get(uploadDir, fileName).toFile();
@@ -63,43 +70,57 @@ public class CteService {
             throw new IllegalArgumentException("Já existe um CT-e registrado com a chave de acesso: " + chaveExtraida);
         }
 
-        // 4. Determinar status inicial por RN05
+        // Tratamento do navio/viagem/direção unificado se informado
+        String navio = request.getNavio();
+        String viagem = request.getViagem();
+        String direcao = request.getDirecao();
+        if ((navio == null || navio.isBlank()) && request.getNavioViagemDirecao() != null && !request.getNavioViagemDirecao().isBlank()) {
+            navio = request.getNavioViagemDirecao();
+            viagem = request.getNavioViagemDirecao();
+        }
+
+        // 4. Determinar status inicial PENDENTE
         Cte novoCte = Cte.builder()
             .numeroCte(request.getNumeroCte())
             .chaveAcesso(chaveExtraida)
             .tomadorNome(request.getTomadorNome())
             .tomadorCnpj(request.getTomadorCnpj())
-            .navio(request.getNavio())
-            .viagem(request.getViagem())
+            .navio(navio)
+            .viagem(viagem)
+            .direcao(direcao)
+            .container(request.getContainer())
+            .quantidadeNotas(request.getQuantidadeNotas())
             .portoOrigem(request.getPortoOrigem())
             .portoDestino(request.getPortoDestino())
             .valorCarga(request.getValorCarga())
             .numeroBooking(request.getNumeroBooking())
             .arquivoPdfPath(fileName)
             .nomeOriginalArquivo(request.getArquivoCte().getOriginalFilename())
-            .status(StatusCte.REGISTRADO)
+            .arquivoAutorizacaoCustoPath(autorizacaoFileName)
+            .nomeOriginalAutorizacao(nomeOriginalAutorizacao)
+            .status(StatusCte.PENDENTE)
             .usuarioUpload(usuario)
             .build();
             
         Cte cteSalvo = cteRepository.save(novoCte);
         
-        // 5. Se porto monitorado, transicionar para AGUARDANDO_DESEMBARACO e alertar DESCARGA
+        // Alerta DESCARGA se porto monitorado
         java.util.List<String> portosMonitorados = portoMonitoradoRepository.findByAtivoTrue().stream()
                 .map(com.sistema.nforaprazo.model.PortoMonitorado::getNome)
                 .toList();
 
         if (cteSalvo.isPortoMonitorado(portosMonitorados)) {
-            cteSalvo.setStatus(StatusCte.AGUARDANDO_DESEMBARACO);
-            cteSalvo = cteRepository.save(cteSalvo);
-            log.info("CT-e {} com porto monitorado ({}). Status: AGUARDANDO_DESEMBARACO. Alerta DESCARGA pendente.",
+            log.info("CT-e {} registrado para porto monitorado ({}). Status: PENDENTE. Enviando alerta.",
                     cteSalvo.getId(), request.getPortoDestino());
             emailService.enviarAlertaDescarga(cteSalvo);
-        } else {
-            log.info("CT-e {} registrado para porto '{}'. Sem alerta (desembaraço é responsabilidade do cliente).",
-                    cteSalvo.getId(), request.getPortoDestino());
         }
         
-        log.info("CT-e registrado com sucesso. ID: {}", cteSalvo.getId());
+        log.info("CT-e registrado com sucesso com status PENDENTE. ID: {}", cteSalvo.getId());
         return cteSalvo;
+    }
+
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<Cte> listarCtesPaginado(org.springframework.data.domain.Pageable pageable) {
+        return cteRepository.findAll(pageable);
     }
 }

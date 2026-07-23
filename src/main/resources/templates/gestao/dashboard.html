@@ -275,7 +275,8 @@
         } else {
             // Mapping responsibilities
             const labelsMap = {
-                'SISTEMA': 'Sistema Navegação',
+                'SISTEMA': 'Interno / Empresa',
+                'EMPRESA_INTERNO': 'Interno / Empresa',
                 'CLIENTE': 'Cliente / Tomador',
                 'PENDENTE': 'Investigação Pendente'
             };
@@ -284,7 +285,7 @@
             const valores = responsabilidadeDados.map(item => item.valorTotal);
             
             const backgroundColors = responsabilidadeDados.map(item => {
-                if (item.responsavel === 'SISTEMA') return '#ef4444'; // red-500 (prejuízo nosso)
+                if (item.responsavel === 'SISTEMA' || item.responsavel === 'EMPRESA_INTERNO') return '#ef4444'; // red-500 (custo interno)
                 if (item.responsavel === 'CLIENTE') return '#10b981'; // emerald-500 (reembolsável)
                 return '#f59e0b'; // amber-500 (pendente)
             });

@@ -22,7 +22,7 @@ public interface CteRepository extends JpaRepository<Cte, UUID> {
     
     boolean existsByChaveAcesso(String chaveAcesso);
 
-    @Query("SELECT COALESCE(SUM(nf.valorNota), 0) * 0.10 FROM Cte c JOIN c.notasFiscais nf WHERE c.status IN :statuses")
+    @Query("SELECT COALESCE(SUM(COALESCE(c.valorCarga, 0)), 0) * 0.10 FROM Cte c WHERE c.status IN :statuses")
     BigDecimal sumValorPotencialMultaByStatusIn(@Param("statuses") List<StatusCte> statuses);
 
     @Query("SELECT DISTINCT c FROM Cte c " +

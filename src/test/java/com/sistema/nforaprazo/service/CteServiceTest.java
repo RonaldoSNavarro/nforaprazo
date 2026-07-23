@@ -127,13 +127,13 @@ class CteServiceTest {
         Cte resultado = cteService.processarUploadCte(request, usuarioTeste.getEmail());
 
         assertNotNull(resultado.getId());
-        assertEquals(StatusCte.AGUARDANDO_DESEMBARACO, resultado.getStatus());
+        assertEquals(StatusCte.PENDENTE, resultado.getStatus());
         verify(emailService, times(1)).enviarAlertaDescarga(resultado);
-        verify(cteRepository, times(2)).save(any(Cte.class)); // um save inicial, um depois de mudar status
+        verify(cteRepository, times(1)).save(any(Cte.class));
     }
 
     @Test
-    @DisplayName("Deve salvar como REGISTRADO e nao enviar e-mail se porto de destino nao for monitorado")
+    @DisplayName("Deve salvar como PENDENTE e nao enviar e-mail se porto de destino nao for monitorado")
     void deveSalvarComoRegistradoSePortoNaoMonitorado() {
         CteUploadRequest request = new CteUploadRequest();
         request.setArquivoCte(mockFile);
@@ -157,8 +157,8 @@ class CteServiceTest {
         Cte resultado = cteService.processarUploadCte(request, usuarioTeste.getEmail());
 
         assertNotNull(resultado.getId());
-        assertEquals(StatusCte.REGISTRADO, resultado.getStatus());
+        assertEquals(StatusCte.PENDENTE, resultado.getStatus());
         verify(emailService, never()).enviarAlertaDescarga(any());
-        verify(cteRepository, times(1)).save(any(Cte.class)); // apenas o save inicial
+        verify(cteRepository, times(1)).save(any(Cte.class));
     }
 }

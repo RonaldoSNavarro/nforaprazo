@@ -3,7 +3,6 @@ package com.sistema.nforaprazo.controller;
 import com.sistema.nforaprazo.dto.CteUploadRequest;
 import com.sistema.nforaprazo.model.Cte;
 import com.sistema.nforaprazo.service.CteService;
-import com.sistema.nforaprazo.repository.CteRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,30 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class CteController {
 
     private final CteService cteService;
-    private final CteRepository cteRepository;
+    private final com.sistema.nforaprazo.service.PdfExtractionService pdfExtractionService;
+
+    @ResponseBody
+    @PostMapping("/extrair-dados")
+    public org.springframework.http.ResponseEntity<com.sistema.nforaprazo.dto.CteExtractionResultDto> extrairDadosPdf(
+            @RequestParam("arquivoCte") org.springframework.web.multipart.MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return org.springframework.http.ResponseEntity.badRequest().build();
+        }
+        java.io.File tempFile = null;
+        try {
+            tempFile = java.io.File.createTempFile("cte_extract_", ".pdf");
+            file.transferTo(tempFile);
+            com.sistema.nforaprazo.dto.CteExtractionResultDto dto = pdfExtractionService.extrairDadosCte(tempFile);
+            return org.springframework.http.ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            log.error("Erro ao extrair dados via AJAX: {}", e.getMessage());
+            return org.springframework.http.ResponseEntity.status(500).build();
+        } finally {
+            if (tempFile != null && tempFile.exists()) {
+                tempFile.delete();
+            }
+        }
+    }
 
     @GetMapping("/upload")
     public String exibirFormUpload(Model model) {
@@ -67,7 +89,7 @@ public class CteController {
     @GetMapping("/lista")
     public String listarCtes(@RequestParam(defaultValue = "0") int page, Model model) {
         // Ordena pelos mais recentes
-        Page<Cte> ctes = cteRepository.findAll(PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "dataUpload")));
+        Page<Cte> ctes = cteService.listarCtesPaginado(PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "dataUpload")));
         model.addAttribute("ctes", ctes);
         return "cte/lista";
     }

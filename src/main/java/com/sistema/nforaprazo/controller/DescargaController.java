@@ -34,6 +34,7 @@ public class DescargaController {
     public String listarPendentes(@RequestParam(defaultValue = "0") int page, Model model) {
         Page<Cte> pendentes = cteRepository.findByStatusIn(
                 List.of(
+                        StatusCte.PENDENTE,
                         StatusCte.AGUARDANDO_DESEMBARACO,
                         StatusCte.DESEMBARACADO,
                         StatusCte.AUTO_RECEBIDO,

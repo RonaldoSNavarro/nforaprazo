@@ -45,6 +45,16 @@ public class CteUploadRequest {
     @Positive(message = "O valor da carga deve ser maior que zero")
     private BigDecimal valorCarga;
 
-    @NotBlank(message = "O número do booking é obrigatório")
     private String numeroBooking;
+
+    private Integer quantidadeNotas;
+
+    private String container;
+
+    private String navioViagemDirecao;
+
+    private String direcao;
+
+    @NotNull(message = "O arquivo de autorização de aceitação de custo é obrigatório")
+    private MultipartFile arquivoAutorizacaoCusto;
 }

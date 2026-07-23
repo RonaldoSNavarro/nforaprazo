@@ -25,8 +25,7 @@ public class ForcarSenhaFiltro extends OncePerRequestFilter {
         // Ignorar caminhos de login, logout, recursos estáticos e a própria tela de alteração de senha
         if (uri.startsWith("/css/") || uri.startsWith("/js/") || uri.startsWith("/fonts/") ||
             uri.startsWith("/images/") || uri.startsWith("/webjars/") || 
-            uri.equals("/login") || uri.equals("/logout") || uri.equals("/alterar-senha") ||
-            uri.startsWith("/actuator/")) { // permitir actuator sem interceptação se necessário
+            uri.equals("/login") || uri.equals("/logout") || uri.equals("/alterar-senha")) {
             filterChain.doFilter(request, response);
             return;
         }

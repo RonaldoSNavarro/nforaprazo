@@ -30,6 +30,7 @@
                         <thead class="text-xs text-slate-400 uppercase bg-slate-900/50 border-b border-slate-700">
                             <tr>
                                 <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Chave de Acesso</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Qtd NFs</th>
                                 <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Status</th>
                                 <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Arquivo Físico</th>
                                 <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Data Upload</th>
@@ -38,7 +39,7 @@
                         <tbody>
                             <!-- Sem resultados -->
                             <tr th:if="${ctes.empty}" class="bg-slate-800 border-b border-slate-700/50">
-                                <td colspan="4" class="px-6 py-8 text-center text-slate-500">Nenhum CT-e registrado no sistema.</td>
+                                <td colspan="5" class="px-6 py-8 text-center text-slate-500">Nenhum CT-e registrado no sistema.</td>
                             </tr>
                             
                             <!-- Resultados -->
@@ -47,6 +48,7 @@
                                     <span th:if="${cte.chaveAcesso}" th:text="${cte.chaveAcesso}">0000...</span>
                                     <span th:unless="${cte.chaveAcesso}" class="text-slate-500 italic">Nao extraída</span>
                                 </td>
+                                <td class="px-6 py-4 text-slate-300 font-semibold" th:text="${cte.quantidadeNotas ?: '1'}">1</td>
                                 <td class="px-6 py-4">
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border"
                                           th:classappend="${

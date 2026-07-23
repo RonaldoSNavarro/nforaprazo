@@ -63,21 +63,11 @@
                                     <span th:text="'Carga: R$ ' + ${#numbers.formatDecimal(cte.valorCarga, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    <!-- Ação 1: Iniciar Investigação -->
-                                    <form th:if="${cte.status.name() == 'AUTO_RECEBIDO'}" 
-                                          th:action="@{/docs-fiscal/iniciar-investigacao}" method="post" class="inline">
-                                        <input type="hidden" name="cteId" th:value="${cte.id}">
-                                        <button type="submit" 
-                                                class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-orange-900/20">
-                                            Iniciar Investigação
-                                        </button>
-                                    </form>
-
-                                    <!-- Ação 2: Concluir Investigação -->
-                                    <button th:if="${cte.status.name() == 'EM_INVESTIGACAO'}" 
+                                    <!-- Ação: Iniciar / Registrar Investigação -->
+                                    <button th:if="${cte.status.name() == 'AUTO_RECEBIDO' || cte.status.name() == 'EM_INVESTIGACAO' || cte.status.name() == 'PENDENTE'}" 
                                             th:attr="onclick=|openConcluirModal('${cte.id}', '${cte.chaveAcesso}')|"
-                                            class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-purple-900/20">
-                                        Concluir Investigação
+                                            class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-amber-900/20">
+                                        Iniciar Investigação
                                     </button>
                                 </td>
                             </tr>
@@ -88,10 +78,10 @@
         </main>
     </div>
 
-    <!-- Modal Concluir Investigação -->
+    <!-- Modal Registrar Investigação -->
     <div id="modalConcluir" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-lg shadow-2xl">
-            <h3 class="text-lg font-bold text-slate-50 mb-2 font-display">Concluir Investigação</h3>
+            <h3 class="text-lg font-bold text-slate-50 mb-2 font-display">Registrar Investigação de Auto de Infração</h3>
             <p class="text-xs text-slate-400 mb-6 font-mono break-all" id="modalConcluir_chaveLabel">Chave: 0000</p>
             
             <form th:action="@{/docs-fiscal/concluir-investigacao}" method="post" enctype="multipart/form-data">
@@ -101,12 +91,12 @@
                     <label class="block text-sm font-medium text-slate-300 mb-2">Responsabilidade pela Inclusão Tardia *</label>
                     <div class="flex gap-4">
                         <label class="flex items-center gap-2 bg-slate-900/50 border border-slate-700 px-4 py-3 rounded-xl cursor-pointer hover:border-slate-600 transition-colors w-full">
-                            <input type="radio" name="responsavel" value="SISTEMA" required class="text-amber-500 focus:ring-amber-500">
-                            <span class="text-sm text-slate-300 font-semibold">Sistema (Absorver custo)</span>
+                            <input type="radio" name="responsavel" value="EMPRESA_INTERNO" required class="text-amber-500 focus:ring-amber-500">
+                            <span class="text-sm text-slate-300 font-semibold">Interno / Empresa</span>
                         </label>
                         <label class="flex items-center gap-2 bg-slate-900/50 border border-slate-700 px-4 py-3 rounded-xl cursor-pointer hover:border-slate-600 transition-colors w-full">
                             <input type="radio" name="responsavel" value="CLIENTE" required class="text-amber-500 focus:ring-amber-500">
-                            <span class="text-sm text-slate-300 font-semibold">Cliente (Emitir Nota de Débito)</span>
+                            <span class="text-sm text-slate-300 font-semibold">Cliente</span>
                         </label>
                     </div>
                 </div>

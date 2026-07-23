@@ -152,6 +152,12 @@ com.sistema.nforaprazo
 - **Decisão:** Coluna `versao` com @Version no Hibernate para prevenir Race Conditions em pagamentos
 - **Justificativa:** Impede duplo-submit e pagamentos duplicados sem custo de lock pessimista
 
+### ADR-004 — Acesso em Rede Local (LAN) para Uso Residencial
+- **Status:** DECIDIDO (Aprovado pelo CTO e usuário)
+- **Decisão:** Utilizar a porta padrão mapeada `8080:8080` vinculada a todas as interfaces (0.0.0.0) do host para acesso via IP da rede local.
+- **Justificativa:** Solução sem custos adicionais de infraestrutura ou riscos de segurança associados à exposição à internet pública. Mapeamento padrão do Docker Compose já permite que outros dispositivos na LAN acessem a aplicação pelo IP do host.
+- **Consequências:** Tráfego residencial trafegará via HTTP normal (sem SSL), o que é aceitável para ambiente local controlado. É recomendado configurar IP estático para o servidor host no roteador.
+
 ---
  
 ## 6. PADRÕES DE CÓDIGO DEFINIDOS
