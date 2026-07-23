@@ -22,8 +22,8 @@ public class PdfExtractionService {
     private static final Pattern CHAVE_SPACED_PATTERN = Pattern.compile("\\b(?:\\d{4}[\\s\\-]*){11}\\b");
     private static final Pattern CHAVE_DIGITOS_PATTERN = Pattern.compile("\\b\\d{44}\\b");
     private static final Pattern BOOKING_PATTERN = Pattern.compile("(?i)Booking:(?:\\s*Booking:)*\\s*([A-Z0-9]{4,20})");
-    private static final Pattern NAVIO_VIAGEM_PATTERN = Pattern.compile("(?i)(?:Navio/Viagem|Navio\\s*:\\s*|Viagem\\s*:\\s*)\\s*([^\n\r]+)");
     private static final Pattern CONTAINER_PATTERN = Pattern.compile("(?i)Container\\s*-[^:]*:\\s*([A-Z]{4}\\d{7})|\\b([A-Z]{4}\\d{7})\\b");
+    private static final Pattern VALOR_CARGA_PATTERN = Pattern.compile("(?i)VALOR\\s+TOTAL\\s+DA\\s+CARGA[\\r\\n\\s]*([\\d\\.\\,]+)");
     private static final Pattern VALOR_COMERCIAL_PATTERN = Pattern.compile("(?i)Valor\\s+Comercial:\\s*([\\d\\.\\,]+)");
     private static final Pattern VALOR_SERVICO_PATTERN = Pattern.compile("(?i)(?:VALOR\\s+TOTAL\\s+DO\\s+SERVIÇO|VALOR\\s+TOTAL\\s+A\\s+RECEBER)[\\r\n\\s]*([\\d\\.\\,]+)");
 
@@ -98,9 +98,19 @@ public class PdfExtractionService {
             }
 
             // 3. Navio / Viagem / Direção
-            Matcher matcherNavio = NAVIO_VIAGEM_PATTERN.matcher(fullText);
+            Matcher matcherNavio = Pattern.compile("(?i)Navio/Viagem\\s*:\\s*([A-Z0-9\\s\\/\\-\\_]+)").matcher(fullText);
             if (matcherNavio.find()) {
-                result.setNavioViagemDirecao(matcherNavio.group(1).trim());
+                String navioStr = matcherNavio.group(1).replaceAll("[\\r\\n]+", " ").replaceAll("\\s+", " ").trim();
+                navioStr = navioStr.replaceAll("(?i)\\s+As:?.*$", "").trim();
+                result.setNavioViagemDirecao(navioStr);
+            } else {
+                Matcher matcherFallbackNavio = Pattern.compile("(?i)(?:Navio|Viagem)\\s*:\\s*([A-Z0-9\\s\\/\\-\\_]+)").matcher(fullText);
+                if (matcherFallbackNavio.find()) {
+                    String navioStr = matcherFallbackNavio.group(1).replaceAll("[\\r\\n]+", " ").replaceAll("\\s+", " ").trim();
+                    navioStr = navioStr.replaceFirst("(?i)^Navio/Viagem\\s*:\\s*", "").trim();
+                    navioStr = navioStr.replaceAll("(?i)\\s+As:?.*$", "").trim();
+                    result.setNavioViagemDirecao(navioStr);
+                }
             }
 
             // 4. Container (4 letras e 7 números)
@@ -122,18 +132,89 @@ public class PdfExtractionService {
             int qtdNotas = Math.max(1, chavesUnicas.size());
             result.setQuantidadeNotas(qtdNotas);
 
-            // 6. Valor da Carga / Valor do CT-e
-            Matcher matcherValorComercial = VALOR_COMERCIAL_PATTERN.matcher(fullText);
-            if (matcherValorComercial.find()) {
-                result.setValorCarga(converterValor(matcherValorComercial.group(1)));
+            // 6. Valor Total da Carga
+            Matcher matcherValorCarga = VALOR_CARGA_PATTERN.matcher(fullText);
+            if (matcherValorCarga.find()) {
+                result.setValorCarga(converterValor(matcherValorCarga.group(1)));
             } else {
-                Matcher matcherValorServico = VALOR_SERVICO_PATTERN.matcher(fullText);
-                if (matcherValorServico.find()) {
-                    result.setValorCarga(converterValor(matcherValorServico.group(1)));
+                Matcher matcherValorComercial = VALOR_COMERCIAL_PATTERN.matcher(fullText);
+                if (matcherValorComercial.find()) {
+                    result.setValorCarga(converterValor(matcherValorComercial.group(1)));
+                } else {
+                    Matcher matcherValorServico = VALOR_SERVICO_PATTERN.matcher(fullText);
+                    if (matcherValorServico.find()) {
+                        result.setValorCarga(converterValor(matcherValorServico.group(1)));
+                    }
                 }
             }
 
-            // 7. Observações
+            // 7. Tomador (Nome e CNPJ)
+            Matcher mTomadorBloco = Pattern.compile("(?i)([^\\n\\r]+?)TOMADOR\\s+DO\\s+SERVI[ÇC]O\\s*:").matcher(fullText);
+            if (mTomadorBloco.find()) {
+                String candidate = mTomadorBloco.group(1).trim();
+                String[] lines = candidate.split("[\\r\\n]+");
+                String nome = lines[lines.length - 1].trim();
+                if (!nome.isBlank() && nome.length() > 3 && !nome.toUpperCase().contains("GLOBALIZADO")) {
+                    result.setTomadorNome(nome);
+                }
+            }
+
+            int idxTomador = fullText.toUpperCase().indexOf("TOMADOR DO SERVIÇO:");
+            if (idxTomador == -1) {
+                idxTomador = fullText.toUpperCase().indexOf("TOMADOR DO SERVI");
+            }
+            if (idxTomador != -1) {
+                int endTomadorBlock = Math.min(fullText.length(), idxTomador + 400);
+                String tomadorBlock = fullText.substring(idxTomador, endTomadorBlock);
+                Pattern pCnpj = Pattern.compile("CNPJ\\s*/\\s*CPF\\s*:\\s*([\\d\\.\\/\\-]+)");
+                Matcher mCnpj = pCnpj.matcher(tomadorBlock);
+                if (mCnpj.find()) {
+                    result.setTomadorCnpj(mCnpj.group(1).trim());
+                }
+            }
+
+            if (result.getTomadorNome() == null || result.getTomadorNome().isBlank()) {
+                Pattern pRemetente = Pattern.compile("(?i)([^\\n\\r]+?)REMETENTE\\s*:");
+                Matcher mRem = pRemetente.matcher(fullText);
+                if (mRem.find()) {
+                    String nomeRem = mRem.group(1).trim();
+                    if (nomeRem.length() > 3) {
+                        result.setTomadorNome(nomeRem);
+                    }
+                }
+            }
+            if (result.getTomadorCnpj() == null || result.getTomadorCnpj().isBlank()) {
+                Pattern pCnpjGeral = Pattern.compile("CNPJ\\s*/\\s*CPF\\s*:\\s*([\\d\\.\\/\\-]+)");
+                Matcher mCnpjGeral = pCnpjGeral.matcher(fullText);
+                if (mCnpjGeral.find()) {
+                    result.setTomadorCnpj(mCnpjGeral.group(1).trim());
+                }
+            }
+
+            // 8. Porto de Origem e Destino
+            Matcher mPrestacao = Pattern.compile("(?i)([A-ZÁÉÍÓÚÂÊÔÃÕÇ\\s]+?\\s*-\\s*[A-Z]{2})\\s+([A-ZÁÉÍÓÚÂÊÔÃÕÇ\\s]+?\\s*-\\s*[A-Z]{2})[\\r\\n\\s]*IN[IÍ]CIO\\s+DA\\s+PRESTA").matcher(fullText);
+            if (mPrestacao.find()) {
+                String orig = mPrestacao.group(1).trim();
+                String dest = mPrestacao.group(2).trim();
+                // Limpar qualquer prefixo de cabeçalho na mesma linha
+                String[] origLines = orig.split("[\\r\\n]+");
+                String[] destLines = dest.split("[\\r\\n]+");
+                result.setPortoOrigem(origLines[origLines.length - 1].trim());
+                result.setPortoDestino(destLines[destLines.length - 1].trim());
+            } else {
+                Pattern pMun = Pattern.compile("(?i)MUNIC[IÍ]PIO\\s*:\\s*([^\\n\\r]+)");
+                Matcher mMun = pMun.matcher(fullText);
+                if (mMun.find()) {
+                    String orig = mMun.group(1).replaceAll("(?i)CEP\\s*:.*", "").trim();
+                    result.setPortoOrigem(orig);
+                }
+                if (mMun.find()) {
+                    String dest = mMun.group(1).replaceAll("(?i)CEP\\s*:.*", "").trim();
+                    result.setPortoDestino(dest);
+                }
+            }
+
+            // 9. Observações
             int obsIndex = fullText.toUpperCase().indexOf("OBSERVAÇÕES");
             if (obsIndex == -1) {
                 obsIndex = fullText.toUpperCase().indexOf("OBSERVACOES");
@@ -143,8 +224,9 @@ public class PdfExtractionService {
                 result.setObservacoes(fullText.substring(obsIndex, endObs).trim());
             }
 
-            log.info("Extracao do CT-e concluida com sucesso. Chave: {}, Numero: {}, Container: {}, Booking: {}, QtdNfs: {}",
-                    result.getChaveAcesso(), result.getNumeroCte(), result.getContainer(), result.getNumeroBooking(), result.getQuantidadeNotas());
+            log.info("Extracao do CT-e concluida. Tomador: {} ({}), Navio: {}, ValorCarga: {}, Origem: {}, Destino: {}",
+                    result.getTomadorNome(), result.getTomadorCnpj(), result.getNavioViagemDirecao(),
+                    result.getValorCarga(), result.getPortoOrigem(), result.getPortoDestino());
 
         } catch (Exception e) {
             log.error("Erro na extracao automatica do PDF do CT-e: {}", e.getMessage(), e);
@@ -181,7 +263,6 @@ public class PdfExtractionService {
     private String extrairChaveTexto(String text) {
         if (text == null || text.isBlank()) return null;
 
-        // 1. Procurar por bloco contendo CHAVE DE ACESSO
         Pattern pChaveBloco = Pattern.compile("(?i)CHAVE\\s+DE\\s+ACESSO[\\s\\S]{1,100}?((?:\\d[\\s\\-]*){44})");
         Matcher mBloco = pChaveBloco.matcher(text);
         if (mBloco.find()) {
@@ -191,7 +272,6 @@ public class PdfExtractionService {
             }
         }
 
-        // 2. Procurar padrão de 44 dígitos espaçados
         Matcher mSpaced = CHAVE_SPACED_PATTERN.matcher(text);
         while (mSpaced.find()) {
             String digits = mSpaced.group().replaceAll("[^0-9]", "");
@@ -200,7 +280,6 @@ public class PdfExtractionService {
             }
         }
 
-        // 3. Procurar 44 dígitos contínuos
         Matcher mDigits = CHAVE_DIGITOS_PATTERN.matcher(text);
         if (mDigits.find()) {
             return mDigits.group();
