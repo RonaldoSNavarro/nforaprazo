@@ -72,4 +72,17 @@ public class StorageService {
             throw new RuntimeException("Falha ao armazenar o arquivo.", e);
         }
     }
+
+    public void delete(String filename) {
+        if (filename == null || filename.isBlank()) return;
+        try {
+            Path file = this.rootLocation.resolve(Paths.get(filename)).normalize().toAbsolutePath();
+            if (Files.exists(file)) {
+                Files.delete(file);
+                log.info("Arquivo {} removido com sucesso de {}", filename, file);
+            }
+        } catch (Exception e) {
+            log.warn("Nao foi possivel deletar o arquivo {}: {}", filename, e.getMessage());
+        }
+    }
 }

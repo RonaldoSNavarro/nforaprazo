@@ -50,25 +50,28 @@ public class CteService {
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
             .orElseThrow(() -> new IllegalArgumentException("Usuario invalido: " + emailUsuario));
 
-        // 1. Salvar arquivos no disco
-        String fileName = storageService.store(request.getArquivoCte());
-        
+        String fileName = null;
         String autorizacaoFileName = null;
         String nomeOriginalAutorizacao = null;
-        if (request.getArquivoAutorizacaoCusto() != null && !request.getArquivoAutorizacaoCusto().isEmpty()) {
-            autorizacaoFileName = storageService.store(request.getArquivoAutorizacaoCusto());
-            nomeOriginalAutorizacao = request.getArquivoAutorizacaoCusto().getOriginalFilename();
-        }
-        
-        // 2. Extrair dados via PDFBox
-        File savedPdf = Paths.get(uploadDir, fileName).toFile();
-        String chaveExtraida = pdfExtractionService.extrairChaveAcesso(savedPdf);
-        
-        // 3. Checar se a chave já existe
-        if (chaveExtraida != null && cteRepository.existsByChaveAcesso(chaveExtraida)) {
-            log.warn("Chave de acesso duplicada detectada: {}", chaveExtraida);
-            throw new IllegalArgumentException("Já existe um CT-e registrado com a chave de acesso: " + chaveExtraida);
-        }
+
+        try {
+            // 1. Salvar arquivos no disco
+            fileName = storageService.store(request.getArquivoCte());
+            
+            if (request.getArquivoAutorizacaoCusto() != null && !request.getArquivoAutorizacaoCusto().isEmpty()) {
+                autorizacaoFileName = storageService.store(request.getArquivoAutorizacaoCusto());
+                nomeOriginalAutorizacao = request.getArquivoAutorizacaoCusto().getOriginalFilename();
+            }
+            
+            // 2. Extrair dados via PDFBox
+            File savedPdf = Paths.get(uploadDir, fileName).toFile();
+            String chaveExtraida = pdfExtractionService.extrairChaveAcesso(savedPdf);
+            
+            // 3. Checar se a chave já existe
+            if (chaveExtraida != null && cteRepository.existsByChaveAcesso(chaveExtraida)) {
+                log.warn("Chave de acesso duplicada detectada: {}", chaveExtraida);
+                throw new IllegalArgumentException("Já existe um CT-e registrado com a chave de acesso: " + chaveExtraida);
+            }
 
         // Tratamento do navio/viagem/direção unificado se informado
         String navio = request.getNavio();
@@ -117,6 +120,12 @@ public class CteService {
         
         log.info("CT-e registrado com sucesso com status PENDENTE. ID: {}", cteSalvo.getId());
         return cteSalvo;
+        } catch (Exception e) {
+            log.error("Erro ao processar upload do CT-e. Efetuando limpeza de arquivos salvos...", e);
+            if (fileName != null) storageService.delete(fileName);
+            if (autorizacaoFileName != null) storageService.delete(autorizacaoFileName);
+            throw e;
+        }
     }
 
     @Transactional(readOnly = true)

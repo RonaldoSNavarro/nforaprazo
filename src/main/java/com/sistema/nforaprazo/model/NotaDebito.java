@@ -10,7 +10,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "nota_debito")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

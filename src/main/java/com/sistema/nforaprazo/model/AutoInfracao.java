@@ -11,7 +11,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "auto_infracao")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

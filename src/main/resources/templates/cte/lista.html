@@ -52,10 +52,10 @@
                                 <td class="px-6 py-4">
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border"
                                           th:classappend="${
-                                            cte.status.name() == 'PENDENTE_DESCARGA' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                                            (cte.status.name() == 'DESEMBARACADO' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                            (cte.status.name() == 'AUTUADO' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'))
-                                          }"
+                                             (cte.status.name() == 'PENDENTE' or cte.status.name() == 'AGUARDANDO_DESEMBARACO') ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                             (cte.status.name() == 'DESEMBARACADO' or cte.status.name() == 'PAGO' or cte.status.name() == 'ENCERRADO_SEM_AUTO') ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                                             (cte.status.name() == 'AUTO_RECEBIDO' or cte.status.name() == 'ENCERRADO_COM_AUTO') ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+                                           }"
                                           th:text="${cte.status}">
                                         STATUS
                                     </span>

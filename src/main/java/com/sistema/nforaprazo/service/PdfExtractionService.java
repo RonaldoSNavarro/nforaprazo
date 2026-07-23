@@ -26,6 +26,14 @@ public class PdfExtractionService {
     private static final Pattern VALOR_CARGA_PATTERN = Pattern.compile("(?i)VALOR\\s+TOTAL\\s+DA\\s+CARGA[\\r\\n\\s]*([\\d\\.\\,]+)");
     private static final Pattern VALOR_COMERCIAL_PATTERN = Pattern.compile("(?i)Valor\\s+Comercial:\\s*([\\d\\.\\,]+)");
     private static final Pattern VALOR_SERVICO_PATTERN = Pattern.compile("(?i)(?:VALOR\\s+TOTAL\\s+DO\\s+SERVIÇO|VALOR\\s+TOTAL\\s+A\\s+RECEBER)[\\r\n\\s]*([\\d\\.\\,]+)");
+    private static final Pattern NAVIO_PATTERN = Pattern.compile("(?i)Navio/Viagem\\s*:\\s*([A-Z0-9\\s\\/\\-\\_]+)");
+    private static final Pattern NAVIO_FALLBACK_PATTERN = Pattern.compile("(?i)(?:Navio|Viagem)\\s*:\\s*([A-Z0-9\\s\\/\\-\\_]+)");
+    private static final Pattern CHAVES_OBS_PATTERN = Pattern.compile("(\\d{44})");
+    private static final Pattern TOMADOR_BLOCO_PATTERN = Pattern.compile("(?i)([^\\n\\r]+?)TOMADOR\\s+DO\\s+SERVI[ÇC]O\\s*:");
+    private static final Pattern CNPJ_PATTERN = Pattern.compile("CNPJ\\s*/\\s*CPF\\s*:\\s*([\\d\\.\\/\\-]+)");
+    private static final Pattern REMETENTE_PATTERN = Pattern.compile("(?i)([^\\n\\r]+?)REMETENTE\\s*:");
+    private static final Pattern PRESTACAO_PORTOS_PATTERN = Pattern.compile("(?i)([A-ZÁÉÍÓÚÂÊÔÃÕÇ\\s]+?\\s*-\\s*[A-Z]{2})\\s+([A-ZÁÉÍÓÚÂÊÔÃÕÇ\\s]+?\\s*-\\s*[A-Z]{2})[\\r\\n\\s]*IN[IÍ]CIO\\s+DA\\s+PRESTA");
+    private static final Pattern MUNICIPIO_PATTERN = Pattern.compile("(?i)MUNIC[IÍ]PIO\\s*:\\s*([^\\n\\r]+)");
 
     public String extrairChaveAcesso(File pdfFile) {
         log.info("Iniciando extracao de dados do PDF: {}", pdfFile.getName());
@@ -98,13 +106,13 @@ public class PdfExtractionService {
             }
 
             // 3. Navio / Viagem / Direção
-            Matcher matcherNavio = Pattern.compile("(?i)Navio/Viagem\\s*:\\s*([A-Z0-9\\s\\/\\-\\_]+)").matcher(fullText);
+            Matcher matcherNavio = NAVIO_PATTERN.matcher(fullText);
             if (matcherNavio.find()) {
                 String navioStr = matcherNavio.group(1).replaceAll("[\\r\\n]+", " ").replaceAll("\\s+", " ").trim();
                 navioStr = navioStr.replaceAll("(?i)\\s+As:?.*$", "").trim();
                 result.setNavioViagemDirecao(navioStr);
             } else {
-                Matcher matcherFallbackNavio = Pattern.compile("(?i)(?:Navio|Viagem)\\s*:\\s*([A-Z0-9\\s\\/\\-\\_]+)").matcher(fullText);
+                Matcher matcherFallbackNavio = NAVIO_FALLBACK_PATTERN.matcher(fullText);
                 if (matcherFallbackNavio.find()) {
                     String navioStr = matcherFallbackNavio.group(1).replaceAll("[\\r\\n]+", " ").replaceAll("\\s+", " ").trim();
                     navioStr = navioStr.replaceFirst("(?i)^Navio/Viagem\\s*:\\s*", "").trim();
@@ -121,7 +129,7 @@ public class PdfExtractionService {
             }
 
             // 5. Quantidade de NFs (chaves de 44 dígitos originárias adicionais)
-            Matcher matcherChavesObs = Pattern.compile("(\\d{44})").matcher(fullText.replaceAll("[^0-9]", " "));
+            Matcher matcherChavesObs = CHAVES_OBS_PATTERN.matcher(fullText.replaceAll("[^0-9]", " "));
             Set<String> chavesUnicas = new HashSet<>();
             while (matcherChavesObs.find()) {
                 chavesUnicas.add(matcherChavesObs.group(1));
@@ -149,7 +157,7 @@ public class PdfExtractionService {
             }
 
             // 7. Tomador (Nome e CNPJ)
-            Matcher mTomadorBloco = Pattern.compile("(?i)([^\\n\\r]+?)TOMADOR\\s+DO\\s+SERVI[ÇC]O\\s*:").matcher(fullText);
+            Matcher mTomadorBloco = TOMADOR_BLOCO_PATTERN.matcher(fullText);
             if (mTomadorBloco.find()) {
                 String candidate = mTomadorBloco.group(1).trim();
                 String[] lines = candidate.split("[\\r\\n]+");
@@ -166,16 +174,14 @@ public class PdfExtractionService {
             if (idxTomador != -1) {
                 int endTomadorBlock = Math.min(fullText.length(), idxTomador + 400);
                 String tomadorBlock = fullText.substring(idxTomador, endTomadorBlock);
-                Pattern pCnpj = Pattern.compile("CNPJ\\s*/\\s*CPF\\s*:\\s*([\\d\\.\\/\\-]+)");
-                Matcher mCnpj = pCnpj.matcher(tomadorBlock);
+                Matcher mCnpj = CNPJ_PATTERN.matcher(tomadorBlock);
                 if (mCnpj.find()) {
                     result.setTomadorCnpj(mCnpj.group(1).trim());
                 }
             }
 
             if (result.getTomadorNome() == null || result.getTomadorNome().isBlank()) {
-                Pattern pRemetente = Pattern.compile("(?i)([^\\n\\r]+?)REMETENTE\\s*:");
-                Matcher mRem = pRemetente.matcher(fullText);
+                Matcher mRem = REMETENTE_PATTERN.matcher(fullText);
                 if (mRem.find()) {
                     String nomeRem = mRem.group(1).trim();
                     if (nomeRem.length() > 3) {
@@ -184,26 +190,23 @@ public class PdfExtractionService {
                 }
             }
             if (result.getTomadorCnpj() == null || result.getTomadorCnpj().isBlank()) {
-                Pattern pCnpjGeral = Pattern.compile("CNPJ\\s*/\\s*CPF\\s*:\\s*([\\d\\.\\/\\-]+)");
-                Matcher mCnpjGeral = pCnpjGeral.matcher(fullText);
+                Matcher mCnpjGeral = CNPJ_PATTERN.matcher(fullText);
                 if (mCnpjGeral.find()) {
                     result.setTomadorCnpj(mCnpjGeral.group(1).trim());
                 }
             }
 
             // 8. Porto de Origem e Destino
-            Matcher mPrestacao = Pattern.compile("(?i)([A-ZÁÉÍÓÚÂÊÔÃÕÇ\\s]+?\\s*-\\s*[A-Z]{2})\\s+([A-ZÁÉÍÓÚÂÊÔÃÕÇ\\s]+?\\s*-\\s*[A-Z]{2})[\\r\\n\\s]*IN[IÍ]CIO\\s+DA\\s+PRESTA").matcher(fullText);
+            Matcher mPrestacao = PRESTACAO_PORTOS_PATTERN.matcher(fullText);
             if (mPrestacao.find()) {
                 String orig = mPrestacao.group(1).trim();
                 String dest = mPrestacao.group(2).trim();
-                // Limpar qualquer prefixo de cabeçalho na mesma linha
                 String[] origLines = orig.split("[\\r\\n]+");
                 String[] destLines = dest.split("[\\r\\n]+");
                 result.setPortoOrigem(origLines[origLines.length - 1].trim());
                 result.setPortoDestino(destLines[destLines.length - 1].trim());
             } else {
-                Pattern pMun = Pattern.compile("(?i)MUNIC[IÍ]PIO\\s*:\\s*([^\\n\\r]+)");
-                Matcher mMun = pMun.matcher(fullText);
+                Matcher mMun = MUNICIPIO_PATTERN.matcher(fullText);
                 if (mMun.find()) {
                     String orig = mMun.group(1).replaceAll("(?i)CEP\\s*:.*", "").trim();
                     result.setPortoOrigem(orig);
