@@ -52,7 +52,7 @@ O sistema é estruturado sobre uma máquina de estados rígida para garantir int
 1. **Leitura e Auto-Preenchimento Automático de CT-e (DACTE):**
    - No momento do upload, o sistema lê o arquivo PDF via AJAX/PDFBox em tempo real.
    - Preenche automaticamente: *Chave de Acesso*, *Número do CT-e*, *Nº Booking*, *Container* (formato `AAAA1234567`), *Qtd. NFs Incluídas*, *Valor da Carga*, *Navio / Viagem / Direção* e *Observações*.
-   - Exige o envio obrigatório da **Autorização de Aceitação de Custo** (PDF ou e-mail) em modal de confirmação.
+   - Exige o envio obrigatório da **Autorização de Aceitação de Custo** (PDF ou e-mail) em modal de confirmação com validação HTML5 acessível (`disabled` dinâmico em campos ocultos para evitar erros de foco e `sr-only` em áreas de dropzone).
 
 2. **Gestão de Autos Pendentes de Pagamento:**
    - Card dedicado no Dashboard Executivo e item de menu lateral (`/faturamento/pendentes-pagamento`).

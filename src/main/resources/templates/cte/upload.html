@@ -37,7 +37,7 @@
                                     <p class="mb-1 text-sm text-slate-300"><span class="font-semibold text-amber-500">Clique para selecionar</span> ou arraste o PDF do CT-e</p>
                                     <p class="text-xs text-slate-500">Apenas arquivos .PDF (Max. 10MB)</p>
                                 </div>
-                                <input id="arquivoCte" name="arquivoCte" type="file" class="hidden" accept=".pdf" required onchange="updateFileName(this)" />
+                                <input id="arquivoCte" name="arquivoCte" type="file" class="sr-only" accept=".pdf" required onchange="updateFileName(this)" />
                             </label>
                         </div>
                         
@@ -127,7 +127,7 @@
                                 
                                 <div class="mb-6">
                                     <label class="block text-xs font-medium text-slate-300 mb-2">Arquivo de Autorização (PDF ou E-mail) *</label>
-                                    <input type="file" id="arquivoAutorizacaoCusto" name="arquivoAutorizacaoCusto" accept=".pdf,.eml,.msg" required class="w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500/10 file:text-amber-400 hover:file:bg-amber-500/20 bg-slate-900/50 border border-slate-700 rounded-xl cursor-pointer">
+                                    <input type="file" id="arquivoAutorizacaoCusto" name="arquivoAutorizacaoCusto" accept=".pdf,.eml,.msg" required disabled class="w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500/10 file:text-amber-400 hover:file:bg-amber-500/20 bg-slate-900/50 border border-slate-700 rounded-xl cursor-pointer">
                                 </div>
 
                                 <div class="flex justify-end gap-3 border-t border-slate-700/50 pt-4">
@@ -210,19 +210,32 @@
         }
 
         function openAutorizacaoModal() {
+            const authInput = document.getElementById('arquivoAutorizacaoCusto');
+            authInput.disabled = true;
+
             const form = document.getElementById('uploadForm');
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
+
+            authInput.disabled = false;
             document.getElementById('modalAutorizacao').classList.remove('hidden');
         }
 
         function closeAutorizacaoModal() {
             document.getElementById('modalAutorizacao').classList.add('hidden');
+            document.getElementById('arquivoAutorizacaoCusto').disabled = true;
         }
         
-        document.getElementById('uploadForm').addEventListener('submit', function() {
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            const modal = document.getElementById('modalAutorizacao');
+            if (modal.classList.contains('hidden')) {
+                e.preventDefault();
+                openAutorizacaoModal();
+                return;
+            }
+
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-slate-950 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Enviando...';
             btn.disabled = true;
