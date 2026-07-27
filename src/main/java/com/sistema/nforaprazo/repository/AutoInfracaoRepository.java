@@ -15,11 +15,10 @@ import java.util.UUID;
 @Repository
 public interface AutoInfracaoRepository extends JpaRepository<AutoInfracao, UUID> {
 
-    @Query("SELECT NEW com.sistema.nforaprazo.dto.AutoInfracaoMensalDto(year(a.dataEmissao), month(a.dataEmissao), COUNT(a), COALESCE(SUM(a.valorMulta), 0)) " +
+    @Query("SELECT NEW com.sistema.nforaprazo.dto.AutoInfracaoMensalDto(year(a.dataRegistro), month(a.dataRegistro), COUNT(a), COALESCE(SUM(a.valorMulta), 0)) " +
            "FROM AutoInfracao a " +
-           "WHERE a.dataEmissao IS NOT NULL " +
-           "GROUP BY year(a.dataEmissao), month(a.dataEmissao) " +
-           "ORDER BY year(a.dataEmissao) ASC, month(a.dataEmissao) ASC")
+           "GROUP BY year(a.dataRegistro), month(a.dataRegistro) " +
+           "ORDER BY year(a.dataRegistro) ASC, month(a.dataRegistro) ASC")
     List<AutoInfracaoMensalDto> findEvolucaoMensal();
 
     @Query("SELECT NEW com.sistema.nforaprazo.dto.ResponsabilidadeDto(a.responsavel, COUNT(a), COALESCE(SUM(a.valorMulta), 0)) " +

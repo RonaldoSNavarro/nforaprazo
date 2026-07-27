@@ -26,7 +26,13 @@
             </div>
 
             <!-- ============ FATURAMENTO CARDS ============ -->
-            <div sec:authorize="hasAnyRole('FATURAMENTO', 'ADMINISTRADOR')" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <section sec:authorize="hasAnyRole('FATURAMENTO', 'ADMINISTRADOR')" class="mb-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="h-px flex-1 bg-slate-800"></div>
+                    <h2 class="text-xs font-semibold tracking-widest text-slate-500 uppercase">Faturamento</h2>
+                    <div class="h-px flex-1 bg-slate-800"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <a href="/cte/upload" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block">
                     <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4">
                         <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -45,19 +51,18 @@
                     <h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Notas de Debito</h3>
                     <p class="text-sm text-slate-400">Gerenciar notas de debito emitidas para clientes</p>
                 </a>
-                <a href="/cte/lista" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Listar CT-es</h3>
-                    <p class="text-sm text-slate-400">Visualizar todos os CT-es registrados no sistema</p>
-                </a>
-            </div>
+                    <a href="/cte/lista" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">&#9776;</div>
+                        <h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Listar CT-es</h3>
+                        <p class="text-sm text-slate-400">Visualizar todos os CT-es registrados no sistema</p>
+                    </a>
+                </div>
+            </section>
 
             <!-- ============ DESCARGA CARDS ============ -->
-            <div sec:authorize="hasAnyRole('DESCARGA', 'ADMINISTRADOR')" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <section sec:authorize="hasAnyRole('DESCARGA', 'ADMINISTRADOR')" class="mb-8">
+                <div class="flex items-center gap-3 mb-4"><div class="h-px flex-1 bg-slate-800"></div><h2 class="text-xs font-semibold tracking-widest text-slate-500 uppercase">Descarga</h2><div class="h-px flex-1 bg-slate-800"></div></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <a href="/descarga/pendentes" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block">
                     <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4">
                         <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,19 +81,14 @@
                     <h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Registrar Pagamento</h3>
                     <p class="text-sm text-slate-400">Upload de DAR, comprovante e capa de pagamento</p>
                 </a>
-                <a href="/cte/lista" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Listar CT-es</h3>
-                    <p class="text-sm text-slate-400">Visualizar todos os CT-es registrados no sistema</p>
-                </a>
-            </div>
+                    <a sec:authorize="hasRole('DESCARGA') and !hasAnyRole('FATURAMENTO', 'ADMINISTRADOR')" href="/cte/lista" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block"><div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">&#9776;</div><h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Listar CT-es</h3><p class="text-sm text-slate-400">Visualizar todos os CT-es registrados no sistema</p></a>
+                </div>
+            </section>
 
             <!-- ============ DOCS_FISCAL CARDS ============ -->
-            <div sec:authorize="hasAnyRole('DOCS_FISCAL', 'ADMINISTRADOR')" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <section sec:authorize="hasAnyRole('DOCS_FISCAL', 'ADMINISTRADOR')" class="mb-8">
+                <div class="flex items-center gap-3 mb-4"><div class="h-px flex-1 bg-slate-800"></div><h2 class="text-xs font-semibold tracking-widest text-slate-500 uppercase">Documentos fiscais</h2><div class="h-px flex-1 bg-slate-800"></div></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <a href="/docs-fiscal/pendentes" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block">
                     <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4">
                         <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,19 +107,14 @@
                     <h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Investigacoes</h3>
                     <p class="text-sm text-slate-400">Apurar responsabilidade e registrar evidencias</p>
                 </a>
-                <a href="/cte/lista" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Listar CT-es</h3>
-                    <p class="text-sm text-slate-400">Visualizar todos os CT-es registrados no sistema</p>
-                </a>
-            </div>
+                    <a sec:authorize="hasRole('DOCS_FISCAL') and !hasAnyRole('FATURAMENTO', 'DESCARGA', 'ADMINISTRADOR')" href="/cte/lista" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block"><div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">&#9776;</div><h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Listar CT-es</h3><p class="text-sm text-slate-400">Visualizar todos os CT-es registrados no sistema</p></a>
+                </div>
+            </section>
 
             <!-- ============ GESTAO CARDS ============ -->
-            <div sec:authorize="hasAnyRole('GESTAO', 'ADMINISTRADOR')" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <section sec:authorize="hasAnyRole('GESTAO', 'ADMINISTRADOR')" class="mb-8">
+                <div class="flex items-center gap-3 mb-4"><div class="h-px flex-1 bg-slate-800"></div><h2 class="text-xs font-semibold tracking-widest text-slate-500 uppercase">Gestão</h2><div class="h-px flex-1 bg-slate-800"></div></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <a href="/dashboard" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block">
                     <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4">
                         <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,16 +133,9 @@
                     <h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Relatorios</h3>
                     <p class="text-sm text-slate-400">Exportar dados em Excel e PDF</p>
                 </a>
-                <a href="/cte/lista" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Listar CT-es</h3>
-                    <p class="text-sm text-slate-400">Visualizar todos os CT-es registrados no sistema</p>
-                </a>
-            </div>
+                    <a sec:authorize="hasRole('GESTAO') and !hasAnyRole('FATURAMENTO', 'DESCARGA', 'DOCS_FISCAL', 'ADMINISTRADOR')" href="/cte/lista" class="card-hover bg-slate-800 border border-slate-700 rounded-xl p-6 block"><div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">&#9776;</div><h3 class="font-display text-lg font-semibold text-slate-50 mb-1">Listar CT-es</h3><p class="text-sm text-slate-400">Visualizar todos os CT-es registrados no sistema</p></a>
+                </div>
+            </section>
         </main>
     </div>
 

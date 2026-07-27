@@ -35,9 +35,11 @@ public class DashboardService {
                 StatusCte.AGUARDANDO_PAGAMENTO
         );
 
-        BigDecimal exposicao = cteRepository.sumValorPotencialMultaByStatusIn(statusesExposicao);
-        BigDecimal pago = pagamentoRepository.sumTotalPago();
-        BigDecimal evitado = encSemAutoRepository.sumTotalEvitado();
+        BigDecimal exposicao = cteRepository.findAllByStatusIn(statusesExposicao).stream()
+                .map(Cte::getValorPotencialMulta)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal pago = valorOuZero(pagamentoRepository.sumTotalPago());
+        BigDecimal evitado = valorOuZero(encSemAutoRepository.sumTotalEvitado());
 
         var evolucao = autoInfracaoRepository.findEvolucaoMensal();
         var responsabilidade = autoInfracaoRepository.findResponsabilidadeStats();
@@ -51,6 +53,10 @@ public class DashboardService {
                 .responsabilidade(responsabilidade)
                 .reincidentes(topTomadores)
                 .build();
+    }
+
+    private BigDecimal valorOuZero(BigDecimal valor) {
+        return valor != null ? valor : BigDecimal.ZERO;
     }
 
     public List<Cte> obterCtesParaRelatorio(String portoDestino, java.time.LocalDate dataInicio, java.time.LocalDate dataFim) {

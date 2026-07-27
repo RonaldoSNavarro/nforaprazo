@@ -184,7 +184,7 @@
                 return `${mes}/${item.ano}`;
             });
             const quantidades = evolucaoDados.map(item => item.quantidade);
-            const valores = evolucaoDados.map(item => item.valorTotal);
+            const valores = evolucaoDados.map(item => Number(item.valorTotal) || 0);
 
             const ctx = document.getElementById('evolucaoChart').getContext('2d');
             new Chart(ctx, {
@@ -282,7 +282,7 @@
             };
 
             const labels = responsabilidadeDados.map(item => labelsMap[item.responsavel] || item.responsavel);
-            const valores = responsabilidadeDados.map(item => item.valorTotal);
+            const valores = responsabilidadeDados.map(item => Number(item.valorTotal) || Number(item.quantidade) || 0);
             
             const backgroundColors = responsabilidadeDados.map(item => {
                 if (item.responsavel === 'SISTEMA' || item.responsavel === 'EMPRESA_INTERNO') return '#ef4444'; // red-500 (custo interno)

@@ -44,7 +44,7 @@ A tabela abaixo detalha as funcionalidades implementadas no sistema:
 
 ## 3. Regras de Negócio (RNs)
 
-*   **RN01 (Cálculo da Multa):** O valor nominal da multa é equivalente a **10% do somatório** das NFs ou valor da carga do CT-e.
+*   **RN01 (Cálculo da Multa):** O valor nominal da multa é equivalente a **10% do somatório** das NFs ou valor da carga do CT-e. Para os indicadores de exposição e de multa evitada, o sistema utiliza a soma das NFs quando ela for maior que zero; na ausência desse valor, utiliza o valor da carga.
 *   **RN02 (Valor da Nota de Débito):** O valor da Nota de Débito gerada ao cliente é exatamente igual ao **valor efetivamente pago**.
 *   **RN03 (Absorção de Multa):** Quando a responsabilidade for `EMPRESA_INTERNO` ou `SISTEMA`, a empresa assume o custo interno sem gerar Nota de Débito. Quando for `CLIENTE`, a emissão de Nota de Débito é habilitada.
 *   **RN04 (Pré-requisito da Nota de Débito):** Uma Nota de Débito só pode ser emitida após o comprovante de pagamento ser registrado.
