@@ -54,9 +54,10 @@ O sistema é estruturado sobre uma máquina de estados rígida para garantir int
    - Preenche automaticamente: *Chave de Acesso*, *Número do CT-e*, *Nº Booking*, *Container* (formato `AAAA1234567`), *Qtd. NFs Incluídas*, *Valor da Carga*, *Navio / Viagem / Direção* e *Observações*.
    - Exige o envio obrigatório da **Autorização de Aceitação de Custo** (PDF ou e-mail) em modal de confirmação com validação HTML5 acessível (`disabled` dinâmico em campos ocultos para evitar erros de foco e `sr-only` em áreas de dropzone).
 
-2. **Gestão de Autos Pendentes de Pagamento:**
-   - Card dedicado no Dashboard Executivo e item de menu lateral (`/faturamento/pendentes-pagamento`).
-   - Listagem completa com *Número Auto*, *Valor Auto*, *Data Lavratura Auto*, *Data Vencimento Auto*, *Tomador/CT-e* e *Responsabilidade*.
+2. **Gestão de CT-es Pendentes e Pagamentos na Descarga:**
+   - Rotas dedicadas na equipe de Descarga: `/descarga/pendentes` (processamento inicial e desembaraço) e `/descarga/pagamentos` (anexo de DAR e comprovante).
+   - Botões na coluna **Ação Requerida** habilitados para registros em status `PENDENTE`, `AGUARDANDO_DESEMBARACO` e `REGISTRADO`.
+   - Card dedicado no Dashboard Executivo e no menu lateral (`/faturamento/pendentes-pagamento` e `/descarga/pagamentos`).
 
 3. **Leitura Automática de DAR & Comprovantes:**
    - Extração automática do valor pago diretamente dos PDFs de guias DAR/DARE anexadas via regex especialista em PDFBox.
@@ -114,7 +115,7 @@ A aplicação é executada via Docker Compose na porta `8082`.
 
 ## 🧪 Como Executar os Testes Automatizados
 
-A aplicação conta com uma suíte com **44 testes unitários e de integração** cobrindo a extração de dados de PDFs reais, a máquina de estados, auditoria via AOP e segurança.
+A aplicação conta com uma suíte com **45 testes unitários e de integração** cobrindo a extração de dados de PDFs reais, a máquina de estados, auditoria via AOP e segurança.
 
 ### Executando pelo Maven
 ```bash

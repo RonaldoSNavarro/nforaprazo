@@ -71,9 +71,9 @@ class DescargaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve falhar ao confirmar desembaraço se o status do CT-e não for AGUARDANDO_DESEMBARACO")
+    @DisplayName("Deve falhar ao confirmar desembaraço se o status do CT-e for inválido (ex: PAGO)")
     void deveFalharConfirmarDesembaracoSeStatusInvalido() {
-        cteTeste.setStatus(StatusCte.REGISTRADO);
+        cteTeste.setStatus(StatusCte.PAGO);
         when(cteRepository.findById(cteId)).thenReturn(Optional.of(cteTeste));
 
         assertThrows(IllegalStateException.class, () -> 

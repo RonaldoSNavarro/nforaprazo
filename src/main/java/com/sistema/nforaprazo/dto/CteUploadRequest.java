@@ -1,5 +1,6 @@
 package com.sistema.nforaprazo.dto;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -29,10 +30,8 @@ public class CteUploadRequest {
     @NotBlank(message = "O CNPJ do tomador é obrigatório")
     private String tomadorCnpj;
 
-    @NotBlank(message = "O nome do navio é obrigatório")
     private String navio;
 
-    @NotBlank(message = "A viagem é obrigatória")
     private String viagem;
 
     @NotBlank(message = "O porto de origem é obrigatório")
@@ -54,6 +53,20 @@ public class CteUploadRequest {
     private String navioViagemDirecao;
 
     private String direcao;
+
+    @AssertTrue(message = "Informe navio e viagem no formato Navio / Viagem / Direção")
+    public boolean isNavioEViagemInformados() {
+        if (navio != null && !navio.isBlank() && viagem != null && !viagem.isBlank()) {
+            return true;
+        }
+
+        if (navioViagemDirecao == null || navioViagemDirecao.isBlank()) {
+            return false;
+        }
+
+        String[] partes = navioViagemDirecao.split("/", 3);
+        return partes.length >= 2 && !partes[0].isBlank() && !partes[1].isBlank();
+    }
 
     @NotNull(message = "O arquivo de autorização de aceitação de custo é obrigatório")
     private MultipartFile arquivoAutorizacaoCusto;

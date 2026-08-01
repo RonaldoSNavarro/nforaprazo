@@ -46,8 +46,8 @@ public class DocsFiscalService {
         Cte cte = cteRepository.findById(request.getCteId())
                 .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));
 
-        if (cte.getStatus() != StatusCte.EM_INVESTIGACAO) {
-            throw new IllegalStateException("O CT-e deve estar no status EM_INVESTIGACAO para concluir a investigação. Status atual: " + cte.getStatus());
+        if (cte.getStatus() != StatusCte.EM_INVESTIGACAO && cte.getStatus() != StatusCte.AUTO_RECEBIDO && cte.getStatus() != StatusCte.PENDENTE) {
+            throw new IllegalStateException("O CT-e deve estar no status AUTO_RECEBIDO ou EM_INVESTIGACAO para concluir a investigação. Status atual: " + cte.getStatus());
         }
 
         AutoInfracao auto = cte.getAutoInfracao();

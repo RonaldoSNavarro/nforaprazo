@@ -46,26 +46,25 @@
                                 <td class="px-6 py-4 font-medium text-amber-500">
                                     <span th:text="${cte.chaveAcesso ?: 'CHAVE NÃO INFORMADA'}">Chave</span>
                                     <p class="text-xs text-slate-500 font-mono mt-1" th:text="${cte.nomeOriginalArquivo}">arquivo.pdf</p>
-                                </td>
-                                <td class="px-6 py-4">
+                                                               <td class="px-6 py-4">
                                      <span class="px-2.5 py-1 rounded-full text-xs font-semibold border"
                                            th:classappend="${
-                                               cte.autoInfracao.responsavel.name() == 'CLIENTE' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-slate-500/10 text-slate-300 border-slate-500/20'}"
-                                           th:text="${cte.autoInfracao.responsavel.descricao ?: cte.autoInfracao.responsavel}">RESPONSÁVEL</span>
+                                               (cte.autoInfracao != null and cte.autoInfracao.responsavel != null and cte.autoInfracao.responsavel.name() == 'CLIENTE') ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-slate-500/10 text-slate-300 border-slate-500/20'}"
+                                           th:text="${cte.autoInfracao?.responsavel?.descricao ?: (cte.autoInfracao?.responsavel ?: 'N/A')}">RESPONSÁVEL</span>
                                  </td>
-                                 <td class="px-6 py-4 font-bold text-slate-50" th:text="'R$ ' + ${#numbers.formatDecimal(cte.autoInfracao.pagamento.valorPago, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
-                                 <td class="px-6 py-4" th:text="${#temporals.format(cte.autoInfracao.pagamento.dataPagamento, 'dd/MM/yyyy')}">Data</td>
+                                 <td class="px-6 py-4 font-bold text-slate-50" th:text="${cte.autoInfracao?.pagamento?.valorPago != null ? ('R$ ' + #numbers.formatDecimal(cte.autoInfracao.pagamento.valorPago, 1, 'POINT', 2, 'COMMA')) : 'R$ 0,00'}">R$ 0,00</td>
+                                 <td class="px-6 py-4" th:text="${cte.autoInfracao?.pagamento?.dataPagamento != null ? #temporals.format(cte.autoInfracao.pagamento.dataPagamento, 'dd/MM/yyyy') : '-'}">Data</td>
                                  <td class="px-6 py-4 text-right">
                                      
                                      <!-- Ação 1: Cliente paga (Nota de Débito habilitada) -->
-                                     <button th:if="${cte.autoInfracao.responsavel.name() == 'CLIENTE'}" 
-                                             th:attr="onclick=|openNotaDebitoModal('${cte.id}', '${cte.chaveAcesso}', '${#numbers.formatDecimal(cte.autoInfracao.pagamento.valorPago, 1, 'POINT', 2, 'COMMA')}')|"
+                                     <button th:if="${cte.autoInfracao != null and cte.autoInfracao.responsavel != null and cte.autoInfracao.responsavel.name() == 'CLIENTE'}" 
+                                             th:attr="onclick=|openNotaDebitoModal('${cte.id}', '${cte.chaveAcesso}', '${#numbers.formatDecimal(cte.autoInfracao?.pagamento?.valorPago ?: 0, 1, 'POINT', 2, 'COMMA')}')|"
                                              class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-amber-900/20">
                                          Emitir Nota de Débito
                                      </button>
 
                                      <!-- Ação 2: Interno/Empresa paga (Apenas contabiliza custo interno - Sem Nota de Débito) -->
-                                     <form th:if="${cte.autoInfracao.responsavel.name() == 'SISTEMA' || cte.autoInfracao.responsavel.name() == 'EMPRESA_INTERNO'}" 
+                                     <form th:if="${cte.autoInfracao != null and cte.autoInfracao.responsavel != null and (cte.autoInfracao.responsavel.name() == 'SISTEMA' || cte.autoInfracao.responsavel.name() == 'EMPRESA_INTERNO')}" 
                                            th:action="@{/faturamento/encerrar-custo-absorvido}" method="post" class="inline">
                                          <input type="hidden" name="cteId" th:value="${cte.id}">
                                          <button type="submit" 
@@ -74,7 +73,7 @@
                                          </button>
                                      </form>
 
-                                </td>
+                                 </td>           </td>
                             </tr>
                         </tbody>
                     </table>

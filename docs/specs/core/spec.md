@@ -12,12 +12,12 @@ A tabela abaixo detalha as funcionalidades implementadas no sistema:
 | :--- | :--- | :--- | :--- |
 | **RF01** | Upload | Alta | Upload de arquivo PDF de CT-e pelo perfil `FATURAMENTO`, com anexação obrigatória de autorização de aceitação de custo em modal dedicado. |
 | **RF02** | Extração | Alta | Extração automática via AJAX e PDFBox dos dados do PDF do CT-e no momento da seleção do arquivo: tomador (nome e CNPJ), chave CT-e (44 dígitos), número do CT-e, navio/viagem/direção, porto de origem, porto de destino, valor do CT-e, número do booking, container (AAAA1234567) e quantidade de NFs. |
-| **RF03** | Status | Alta | Status inicial do CT-e recém-cadastrado é `PENDENTE`. Identificação de portos monitorados para roteamento operacional de desembaraço. |
+| **RF03** | Status | Alta | Status inicial do CT-e recém-cadastrado é `PENDENTE`. Identificação de portos monitorados para roteamento operacional de desembaraço e liberação imediata das ações da equipe de Descarga (`Confirmar Desembaraço`, `Anexar Auto`, `Encerrar Sem Auto`). |
 | **RF04** | Notificação | Alta | Disparo de e-mails automáticos via Spring Mail em cada transição relevante de status do ciclo do CT-e. |
 | **RF05** | Auto Infração | Alta | Upload do PDF do Auto de Infração vinculado ao CT-e, com registro da data de emissão, data de vencimento e valor da multa. |
 | **RF06** | Auto Infração | Alta | Disparo de alerta automático por e-mail para o perfil `DOCS_FISCAL` logo após o registro do Auto de Infração no sistema. |
 | **RF07** | Investigação | Alta | Registro da investigação pelo perfil `DOCS_FISCAL`: preenchimento imediato via modal com apuração de responsável (`EMPRESA_INTERNO` vs `CLIENTE`), motivo do erro e número do ticket/evidência. |
-| **RF08** | Pagamento | Alta | Upload dos arquivos DAR (com extração automática de valor pago por PDFBox), comprovante de pagamento e capa do processo, com o registro do valor efetivamente pago pelo perfil `DESCARGA`. |
+| **RF08** | Pagamento | Alta | Rotas dedicadas `/descarga/pendentes` e `/descarga/pagamentos`, com upload dos arquivos DAR (com extração automática de valor pago por PDFBox), comprovante de pagamento e capa do processo, registrando o valor efetivamente pago pelo perfil `DESCARGA`. |
 | **RF09** | Pagamento | Alta | Disparo de alerta automático por e-mail para o perfil `FATURAMENTO` após a confirmação e registro do pagamento. |
 | **RF10** | Encerramento | Alta | Emissão de Nota de Débito exclusiva para responsabilidade `CLIENTE`. Quando a responsabilidade for `EMPRESA_INTERNO` ou `SISTEMA`, encerramento com contabilização de custo interno absorvido. |
 | **RF11** | Encerramento | Alta | Fluxo sem auto de infração: encerramento motivado pelo perfil `DESCARGA` com justificativa obrigatória e status `ENCERRADO_SEM_AUTO`. |

@@ -47,6 +47,16 @@ public class DescargaController {
         return "descarga/pendentes";
     }
 
+    @GetMapping("/pagamentos")
+    public String listarPagamentos(@RequestParam(defaultValue = "0") int page, Model model) {
+        Page<Cte> pagamentos = cteRepository.findByStatusIn(
+                List.of(StatusCte.AGUARDANDO_PAGAMENTO),
+                PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "dataUpload")));
+
+        model.addAttribute("ctes", pagamentos);
+        return "descarga/pendentes";
+    }
+
     @PostMapping("/confirmar-desembaraco")
     public String confirmarDesembaraco(@RequestParam("cteId") UUID cteId, Authentication authentication, RedirectAttributes redirectAttributes) {
         try {

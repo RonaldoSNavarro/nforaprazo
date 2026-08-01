@@ -41,7 +41,7 @@ public class DescargaService {
         Cte cte = cteRepository.findById(cteId)
                 .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));
 
-        if (cte.getStatus() != StatusCte.PENDENTE && cte.getStatus() != StatusCte.AGUARDANDO_DESEMBARACO) {
+        if (cte.getStatus() != StatusCte.PENDENTE && cte.getStatus() != StatusCte.AGUARDANDO_DESEMBARACO && cte.getStatus() != StatusCte.REGISTRADO) {
             throw new IllegalStateException("Operação inválida para o status atual do CT-e: " + cte.getStatus());
         }
         cte.setStatus(StatusCte.DESEMBARACADO);
@@ -55,7 +55,7 @@ public class DescargaService {
         Cte cte = cteRepository.findById(request.getCteId())
                 .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));
 
-        if (cte.getStatus() != StatusCte.PENDENTE && cte.getStatus() != StatusCte.DESEMBARACADO && cte.getStatus() != StatusCte.REGISTRADO) {
+        if (cte.getStatus() != StatusCte.PENDENTE && cte.getStatus() != StatusCte.AGUARDANDO_DESEMBARACO && cte.getStatus() != StatusCte.DESEMBARACADO && cte.getStatus() != StatusCte.REGISTRADO) {
             throw new IllegalStateException("Operação inválida para o status atual do CT-e: " + cte.getStatus());
         }
         
@@ -168,7 +168,7 @@ public class DescargaService {
         Cte cte = cteRepository.findById(request.getCteId())
                 .orElseThrow(() -> new IllegalArgumentException("CT-e não encontrado"));
 
-        if (cte.getStatus() != StatusCte.PENDENTE && cte.getStatus() != StatusCte.DESEMBARACADO && cte.getStatus() != StatusCte.REGISTRADO) {
+        if (cte.getStatus() != StatusCte.PENDENTE && cte.getStatus() != StatusCte.AGUARDANDO_DESEMBARACO && cte.getStatus() != StatusCte.DESEMBARACADO && cte.getStatus() != StatusCte.REGISTRADO) {
             throw new IllegalStateException("Operação inválida para o status atual do CT-e: " + cte.getStatus());
         }
 

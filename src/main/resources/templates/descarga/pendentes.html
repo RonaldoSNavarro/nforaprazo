@@ -49,9 +49,9 @@
                                 <td class="px-6 py-4">
                                     <span class="px-2.5 py-1 rounded-full text-xs font-medium border"
                                           th:classappend="${
-                                              cte.status.name() == 'AGUARDANDO_DESEMBARACO' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                              (cte.status.name() == 'PENDENTE' or cte.status.name() == 'AGUARDANDO_DESEMBARACO' or cte.status.name() == 'REGISTRADO') ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
                                               (cte.status.name() == 'DESEMBARACADO' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                              (cte.status.name() == 'AUTO_RECEBIDO' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                                              (cte.status.name() == 'AUTO_RECEBIDO' or cte.status.name() == 'EM_INVESTIGACAO' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
                                               (cte.status.name() == 'AGUARDANDO_PAGAMENTO' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20')))}"
                                           th:text="${cte.status}">STATUS</span>
                                 </td>
@@ -59,35 +59,41 @@
                                 <td class="px-6 py-4 text-right">
                                     
                                     <!-- Ação 1: Confirmar Desembaraço -->
-                                    <button th:if="${cte.status.name() == 'AGUARDANDO_DESEMBARACO'}" 
+                                    <button th:if="${cte.status == null or cte.status.name() == 'PENDENTE' or cte.status.name() == 'AGUARDANDO_DESEMBARACO' or cte.status.name() == 'REGISTRADO'}" 
                                             th:attr="onclick=|openModal('modalConfirmar', '${cte.id}')|"
                                             class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-amber-900/20">
                                         Confirmar Desembaraço SEFAZ
                                     </button>
 
                                     <!-- Ação 2: Anexar Auto -->
-                                    <button th:if="${cte.status.name() == 'DESEMBARACADO'}" 
+                                    <button th:if="${cte.status != null and (cte.status.name() == 'DESEMBARACADO' or cte.status.name() == 'PENDENTE' or cte.status.name() == 'AGUARDANDO_DESEMBARACO' or cte.status.name() == 'REGISTRADO')}" 
                                             th:attr="onclick=|openModal('modalAuto', '${cte.id}')|"
-                                            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-blue-900/20">
+                                            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-blue-900/20 ml-2">
                                         Anexar Auto Infração
                                     </button>
 
                                     <!-- Ação 2.5: Encerrar Sem Auto -->
-                                    <button th:if="${cte.status.name() == 'DESEMBARACADO'}" 
-                                            th:attr="onclick=|openSemAutoModal('${cte.id}', '${cte.chaveAcesso}', '${#numbers.formatDecimal(cte.getValorPotencialMulta(), 1, 'POINT', 2, 'COMMA')}')|"
+                                    <button th:if="${cte.status != null and (cte.status.name() == 'DESEMBARACADO' or cte.status.name() == 'PENDENTE' or cte.status.name() == 'AGUARDANDO_DESEMBARACO' or cte.status.name() == 'REGISTRADO')}" 
+                                            th:attr="onclick=|openSemAutoModal('${cte.id}', '${cte.chaveAcesso ?: ''}', '${#numbers.formatDecimal(cte.valorPotencialMulta ?: 0, 1, 'POINT', 2, 'COMMA')}')|"
                                             class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-emerald-900/20 ml-2">
                                         Encerrar Sem Auto
                                     </button>
 
+                                    <!-- Indicador para Em Investigação -->
+                                    <span th:if="${cte.status != null and (cte.status.name() == 'AUTO_RECEBIDO' or cte.status.name() == 'EM_INVESTIGACAO')}"
+                                          class="text-xs text-purple-400 font-medium italic">
+                                        Em Investigação (Docs Fiscal)
+                                    </span>
+
                                     <!-- Ação 3: Anexar DAR -->
-                                    <button th:if="${cte.status.name() == 'AGUARDANDO_PAGAMENTO' and (cte.autoInfracao == null or cte.autoInfracao.pagamento == null or cte.autoInfracao.pagamento.pathDarPdf == null)}" 
+                                    <button th:if="${cte.status != null and cte.status.name() == 'AGUARDANDO_PAGAMENTO' and (cte.autoInfracao == null or cte.autoInfracao.pagamento == null or cte.autoInfracao.pagamento.pathDarPdf == null)}" 
                                             th:attr="onclick=|openModal('modalDar', '${cte.id}')|"
                                             class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-purple-900/20">
                                         Gerar/Anexar DAR
                                     </button>
 
                                     <!-- Ação 4: Comprovante de Pagamento -->
-                                    <button th:if="${cte.status.name() == 'AGUARDANDO_PAGAMENTO' and cte.autoInfracao != null and cte.autoInfracao.pagamento != null and cte.autoInfracao.pagamento.pathDarPdf != null}" 
+                                    <button th:if="${cte.status != null and cte.status.name() == 'AGUARDANDO_PAGAMENTO' and cte.autoInfracao != null and cte.autoInfracao.pagamento != null and cte.autoInfracao.pagamento.pathDarPdf != null}" 
                                             th:attr="onclick=|openModal('modalComprovante', '${cte.id}')|"
                                             class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-green-900/20">
                                         Confirmar Pagamento

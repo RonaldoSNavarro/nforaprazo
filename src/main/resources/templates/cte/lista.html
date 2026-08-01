@@ -34,12 +34,13 @@
                                 <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Status</th>
                                 <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Arquivo Físico</th>
                                 <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Data Upload</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider text-right">Ação</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Sem resultados -->
                             <tr th:if="${ctes.empty}" class="bg-slate-800 border-b border-slate-700/50">
-                                <td colspan="5" class="px-6 py-8 text-center text-slate-500">Nenhum CT-e registrado no sistema.</td>
+                                <td colspan="6" class="px-6 py-8 text-center text-slate-500">Nenhum CT-e registrado no sistema.</td>
                             </tr>
                             
                             <!-- Resultados -->
@@ -66,6 +67,27 @@
                                 </td>
                                 <td class="px-6 py-4" th:text="${#temporals.format(cte.dataUpload, 'dd/MM/yyyy HH:mm')}">
                                     01/01/2026
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <a th:if="${cte.status.name() == 'PENDENTE' or cte.status.name() == 'AGUARDANDO_DESEMBARACO' or cte.status.name() == 'DESEMBARACADO' or cte.status.name() == 'AGUARDANDO_PAGAMENTO'}"
+                                       th:href="@{/descarga/pendentes}" 
+                                       class="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600 text-amber-300 hover:text-white text-xs font-semibold rounded-lg transition-colors border border-amber-500/30">
+                                        Ir para Descarga
+                                    </a>
+                                    <a th:if="${cte.status.name() == 'AUTO_RECEBIDO' or cte.status.name() == 'EM_INVESTIGACAO'}"
+                                       th:href="@{/docs-fiscal/pendentes}" 
+                                       class="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white text-xs font-semibold rounded-lg transition-colors border border-purple-500/30">
+                                        Investigar
+                                    </a>
+                                    <a th:if="${cte.status.name() == 'PAGO'}"
+                                       th:href="@{/faturamento/nota-debito}" 
+                                       class="inline-flex items-center gap-2 px-3 py-1.5 bg-green-600/20 hover:bg-green-600 text-green-300 hover:text-white text-xs font-semibold rounded-lg transition-colors border border-green-500/30">
+                                        Faturamento
+                                    </a>
+                                    <span th:if="${cte.status.name() == 'ENCERRADO_COM_AUTO' or cte.status.name() == 'ENCERRADO_SEM_AUTO'}"
+                                          class="text-xs text-slate-500 italic">
+                                        Concluído
+                                    </span>
                                 </td>
                             </tr>
                         </tbody>

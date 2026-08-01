@@ -73,13 +73,21 @@ public class CteService {
                 throw new IllegalArgumentException("Já existe um CT-e registrado com a chave de acesso: " + chaveExtraida);
             }
 
-        // Tratamento do navio/viagem/direção unificado se informado
+        // A tela de upload informa navio, viagem e direção em um único campo.
         String navio = request.getNavio();
         String viagem = request.getViagem();
         String direcao = request.getDirecao();
-        if ((navio == null || navio.isBlank()) && request.getNavioViagemDirecao() != null && !request.getNavioViagemDirecao().isBlank()) {
-            navio = request.getNavioViagemDirecao();
-            viagem = request.getNavioViagemDirecao();
+        if (request.getNavioViagemDirecao() != null && !request.getNavioViagemDirecao().isBlank()) {
+            String[] partes = request.getNavioViagemDirecao().split("/", 3);
+            if ((navio == null || navio.isBlank()) && partes.length > 0) {
+                navio = partes[0].trim();
+            }
+            if ((viagem == null || viagem.isBlank()) && partes.length > 1) {
+                viagem = partes[1].trim();
+            }
+            if ((direcao == null || direcao.isBlank()) && partes.length > 2) {
+                direcao = partes[2].trim();
+            }
         }
 
         // 4. Determinar status inicial PENDENTE

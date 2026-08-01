@@ -161,4 +161,31 @@ class CteServiceTest {
         verify(emailService, never()).enviarAlertaDescarga(any());
         verify(cteRepository, times(1)).save(any(Cte.class));
     }
+
+    @Test
+    @DisplayName("Deve separar navio, viagem e direção informados no campo unificado")
+    void deveSepararNavioViagemEDirecaoDoCampoUnificado() {
+        CteUploadRequest request = new CteUploadRequest();
+        request.setArquivoCte(mockFile);
+        request.setNumeroCte("1003");
+        request.setTomadorNome("Tomador Ltda");
+        request.setTomadorCnpj("00.000.000/0001-00");
+        request.setPortoOrigem("Santos");
+        request.setPortoDestino("Manaus");
+        request.setValorCarga(new BigDecimal("1000.00"));
+        request.setNavioViagemDirecao("VICENTE PINZON / 618N / NORTE");
+
+        when(usuarioRepository.findByEmail(usuarioTeste.getEmail())).thenReturn(Optional.of(usuarioTeste));
+        when(storageService.store(mockFile)).thenReturn("stored-uuid3.pdf");
+        when(pdfExtractionService.extrairChaveAcesso(any(File.class))).thenReturn("35260600000000000000000000000000000000000003");
+        when(cteRepository.existsByChaveAcesso(any())).thenReturn(false);
+        when(portoMonitoradoRepository.findByAtivoTrue()).thenReturn(java.util.List.of());
+        when(cteRepository.save(any(Cte.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Cte resultado = cteService.processarUploadCte(request, usuarioTeste.getEmail());
+
+        assertEquals("VICENTE PINZON", resultado.getNavio());
+        assertEquals("618N", resultado.getViagem());
+        assertEquals("NORTE", resultado.getDirecao());
+    }
 }
