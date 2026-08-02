@@ -6,7 +6,7 @@ O **NF Fora do Prazo** é um sistema web corporativo desenvolvido para gerenciar
 
 ## 🛠️ Stack Tecnológica
 
-- **Backend:** Java 21 / Spring Boot 3.4 / Maven
+- **Backend:** Java 25 LTS / Spring Boot 4.1.0 / Maven
 - **Segurança:** Spring Security (BCrypt, controle de acesso baseado em Roles por URL, troca obrigatória de senha e filtro de sessão)
 - **Banco de Dados:** PostgreSQL 16 / Migrações automatizadas via Flyway (`V1` a `V17`)
 - **Frontend:** Thymeleaf / Vanilla CSS / Tailwind CSS (via CDN) / Chart.js (via CDN)
@@ -61,6 +61,7 @@ O sistema é estruturado sobre uma máquina de estados rígida para garantir int
 
 3. **Leitura Automática de DAR & Comprovantes:**
    - Extração automática do valor pago diretamente dos PDFs de guias DAR/DARE anexadas via regex especialista em PDFBox.
+   - Ao selecionar um comprovante na tela `/descarga/pendentes`, o sistema tenta preencher valor pago e data do pagamento via PDFBox/AJAX; os campos permanecem editáveis quando o documento não contém os rótulos esperados.
 
 4. **Apuração de Responsabilidade & Encerramento:**
    - Classificação entre **Interno/Empresa** (`EMPRESA_INTERNO`) e **Cliente** (`CLIENTE`).
@@ -115,7 +116,7 @@ A aplicação é executada via Docker Compose na porta `8082`.
 
 ## 🧪 Como Executar os Testes Automatizados
 
-A aplicação conta com uma suíte com **45 testes unitários e de integração** cobrindo a extração de dados de PDFs reais, a máquina de estados, auditoria via AOP e segurança.
+A aplicação conta com uma suíte com **48 testes unitários e de integração** cobrindo a extração de dados de PDFs, a máquina de estados, auditoria via AOP e segurança.
 
 ### Executando pelo Maven
 ```bash

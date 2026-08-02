@@ -165,23 +165,24 @@
     <div id="modalComprovante" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-lg shadow-2xl">
             <h3 class="text-lg font-bold text-slate-50 mb-4">Confirmar Pagamento</h3>
-            <form th:action="@{/descarga/comprovante}" method="post" enctype="multipart/form-data">
+            <form id="formComprovante" th:action="@{/descarga/comprovante}" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="cteId" id="modalComprovante_cteId">
                 
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">Valor Pago *</label>
-                        <input type="number" step="0.01" name="valorPago" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-slate-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all">
+                        <input type="number" step="0.01" name="valorPago" id="modalComprovante_valorPago" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-slate-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">Data do Pagamento *</label>
-                        <input type="date" name="dataPagamento" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-slate-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+                        <input type="date" name="dataPagamento" id="modalComprovante_dataPagamento" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-slate-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all">
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-slate-300 mb-2">Comprovante de Pagamento (PDF) *</label>
-                    <input type="file" name="comprovantePdf" accept="application/pdf" required class="w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-500/10 file:text-green-400 hover:file:bg-green-500/20 bg-slate-900/50 border border-slate-700 rounded-xl cursor-pointer">
+                    <input type="file" name="comprovantePdf" id="modalComprovante_arquivo" accept="application/pdf" required class="w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-500/10 file:text-green-400 hover:file:bg-green-500/20 bg-slate-900/50 border border-slate-700 rounded-xl cursor-pointer">
+                    <p id="comprovanteExtracaoStatus" class="hidden mt-2 text-xs"></p>
                 </div>
                 
                 <div class="mb-6">
@@ -223,6 +224,10 @@
 
     <script>
         function openModal(modalId, cteId) {
+            if (modalId === 'modalComprovante') {
+                document.getElementById('formComprovante').reset();
+                atualizarStatusExtracao('');
+            }
             document.getElementById(modalId).classList.remove('hidden');
             document.getElementById(modalId + '_cteId').value = cteId;
         }
@@ -251,6 +256,53 @@
                 }
             });
         }
+
+        const comprovanteArquivo = document.getElementById('modalComprovante_arquivo');
+        const valorPago = document.getElementById('modalComprovante_valorPago');
+        const dataPagamento = document.getElementById('modalComprovante_dataPagamento');
+        const formComprovante = document.getElementById('formComprovante');
+
+        function atualizarStatusExtracao(mensagem, sucesso = false) {
+            const status = document.getElementById('comprovanteExtracaoStatus');
+            status.textContent = mensagem;
+            status.className = mensagem
+                ? `mt-2 text-xs ${sucesso ? 'text-green-400' : 'text-amber-400'}`
+                : 'hidden mt-2 text-xs';
+        }
+
+        comprovanteArquivo.addEventListener('change', async () => {
+            const arquivo = comprovanteArquivo.files[0];
+            if (!arquivo) return;
+
+            const dados = new FormData();
+            dados.append('comprovantePdf', arquivo);
+            const csrf = formComprovante.querySelector('input[name="_csrf"]');
+            if (csrf) dados.append(csrf.name, csrf.value);
+
+            atualizarStatusExtracao('Lendo valor e data do comprovante...');
+            try {
+                const resposta = await fetch('/descarga/extrair-comprovante', {
+                    method: 'POST',
+                    body: dados,
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!resposta.ok) throw new Error('Falha na leitura do PDF');
+
+                const resultado = await resposta.json();
+                if (resultado.valorPago != null) valorPago.value = resultado.valorPago;
+                if (resultado.dataPagamento != null) dataPagamento.value = resultado.dataPagamento;
+
+                const encontrouDados = resultado.valorPago != null || resultado.dataPagamento != null;
+                atualizarStatusExtracao(
+                    encontrouDados
+                        ? 'Dados encontrados e preenchidos. Confira antes de finalizar.'
+                        : 'Dados nao encontrados no PDF. Preencha manualmente.',
+                    encontrouDados
+                );
+            } catch (erro) {
+                atualizarStatusExtracao('Nao foi possivel ler o PDF. Preencha os campos manualmente.');
+            }
+        });
     </script>
     <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>

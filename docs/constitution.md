@@ -8,13 +8,13 @@ Este documento estabelece as bases tecnológicas, a arquitetura de pacotes, as d
 
 A stack técnica foi acordada e não deve ser alterada sem uma nova Architectural Decision Record (ADR) aprovada pelo CTO:
 
-*   **Backend:** Java 21 + Spring Boot 3.x + Maven
+*   **Backend:** Java 25 LTS + Spring Boot 4.1.0 + Maven
 *   **Frontend:** Thymeleaf + Tailwind CSS (via CDN) + Chart.js (via CDN)
 *   **Banco de Dados:** PostgreSQL 16
 *   **Migrations de Banco:** Flyway (comportamento estritamente imutável após aplicadas)
 *   **Segurança:** Spring Security (com autenticação via BCrypt, autorização e controle de acesso RBAC baseado em perfis mapeados por URLs)
 *   **Serviço de E-mail:** Spring Mail / JavaMailSender (envios assíncronos)
-*   **Leitura de PDF:** Apache PDFBox 3.x (extração de chaves de acesso de 44 dígitos)
+*   **Leitura de PDF:** Apache PDFBox 3.x (CT-e, DAR e comprovantes de pagamento)
 *   **Exportação de Relatórios:** Apache POI (geração de arquivos Excel `.xlsx`)
 *   **Deploy / Infraestrutura:** VPS Ubuntu 24 + Docker + Nginx (ambiente de produção)
 

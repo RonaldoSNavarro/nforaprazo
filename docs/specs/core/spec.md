@@ -17,7 +17,7 @@ A tabela abaixo detalha as funcionalidades implementadas no sistema:
 | **RF05** | Auto Infração | Alta | Upload do PDF do Auto de Infração vinculado ao CT-e, com registro da data de emissão, data de vencimento e valor da multa. |
 | **RF06** | Auto Infração | Alta | Disparo de alerta automático por e-mail para o perfil `DOCS_FISCAL` logo após o registro do Auto de Infração no sistema. |
 | **RF07** | Investigação | Alta | Registro da investigação pelo perfil `DOCS_FISCAL`: preenchimento imediato via modal com apuração de responsável (`EMPRESA_INTERNO` vs `CLIENTE`), motivo do erro e número do ticket/evidência. |
-| **RF08** | Pagamento | Alta | Rotas dedicadas `/descarga/pendentes` e `/descarga/pagamentos`, com upload dos arquivos DAR (com extração automática de valor pago por PDFBox), comprovante de pagamento e capa do processo, registrando o valor efetivamente pago pelo perfil `DESCARGA`. |
+| **RF08** | Pagamento | Alta | Rotas dedicadas `/descarga/pendentes` e `/descarga/pagamentos`, com upload dos arquivos DAR (com extração automática de valor pago por PDFBox), comprovante de pagamento e capa do processo, registrando o valor efetivamente pago pelo perfil `DESCARGA`. Ao selecionar o comprovante, o sistema tenta extrair e preencher automaticamente valor pago e data do pagamento; ambos continuam editáveis. |
 | **RF09** | Pagamento | Alta | Disparo de alerta automático por e-mail para o perfil `FATURAMENTO` após a confirmação e registro do pagamento. |
 | **RF10** | Encerramento | Alta | Emissão de Nota de Débito exclusiva para responsabilidade `CLIENTE`. Quando a responsabilidade for `EMPRESA_INTERNO` ou `SISTEMA`, encerramento com contabilização de custo interno absorvido. |
 | **RF11** | Encerramento | Alta | Fluxo sem auto de infração: encerramento motivado pelo perfil `DESCARGA` com justificativa obrigatória e status `ENCERRADO_SEM_AUTO`. |
@@ -38,7 +38,7 @@ A tabela abaixo detalha as funcionalidades implementadas no sistema:
 | **RNF05** | Armazenamento | Arquivos PDF armazenados localmente em disco em `/app/uploads`, vinculados por UUID. |
 | **RNF06** | Segurança | RBAC por endpoints gerenciado pelo Spring Security com hashes BCrypt. |
 | **RNF07** | Auditoria | Trilha de auditoria transversal via Spring AOP interceptando ações anotadas com `@Auditable`. |
-| **RNF08** | Usabilidade | Gráficos interativos com `Chart.js` e auto-preenchimento AJAX de formulários. |
+| **RNF08** | Usabilidade | Gráficos interativos com `Chart.js` e auto-preenchimento AJAX de formulários, incluindo valor e data do comprovante de pagamento quando presentes no PDF. |
 
 ---
 
@@ -170,7 +170,7 @@ LogAlerta (
 4.  **Investigação de Culpa:** O time `DOCS_FISCAL` apura a culpa pelo atraso.
     *   Após preencher os dados de responsável, motivo e ticket de evidência, o status passa para `EM_INVESTIGACAO`.
     *   Definido o responsável final, o status passa para `AGUARDANDO_PAGAMENTO` e alerta a `DESCARGA`.
-5.  **Ação de Pagamento:** O operador de `DESCARGA` efetua o pagamento no banco/SEFAZ externamente e anexa os PDFs de DAR, Comprovante e Capa. O status é alterado para `PAGO` e um alerta de e-mail é enviado ao time de `FATURAMENTO`.
+5.  **Ação de Pagamento:** O operador de `DESCARGA` efetua o pagamento no banco/SEFAZ externamente, anexa o comprovante e o sistema tenta preencher valor/data a partir do PDF; o operador revisa ou corrige os campos, anexa DAR e Capa quando aplicável, e finaliza a baixa. O status é alterado para `PAGO` e um alerta de e-mail é enviado ao time de `FATURAMENTO`.
 6.  **Encerramento do Processo:**
     *   Se a responsabilidade do atraso for do **CLIENTE**: O operador de `FATURAMENTO` cadastra a Nota de Débito faturada ao cliente. O status migra para `ENCERRADO_COM_AUTO`.
     *   Se a responsabilidade do atraso for do **SISTEMA**: A empresa assume o prejuízo, o status transiciona diretamente para `ENCERRADO_COM_AUTO` sem a necessidade de emissão de Nota de Débito.
@@ -213,7 +213,7 @@ LogAlerta (
 | **UC02** | `SISTEMA` | Roteamento por Porto de Destino | Análise do porto de destino do CT-e recém-cadastrado para tomada de decisão quanto aos alertas de e-mail operacionais. |
 | **UC03** | `DOCS_FISCAL` / Fiscal | Registrar Recebimento do Auto | Registro da autuação fiscal associada ao CT-e informando valores, datas e PDF do Auto de Infração. |
 | **UC04** | `DOCS_FISCAL` | Registrar Investigação Fiscal | Definição da culpa (SISTEMA vs CLIENTE), preenchimento do motivo, ticket e evidência para destravar o pagamento. |
-| **UC05** | `DESCARGA` | Registrar Comprovação de Pagamento | Inserção dos dados financeiros do pagamento (DAR, Comprovante e Capa) para alteração de status do processo para PAGO. |
+| **UC05** | `DESCARGA` | Registrar Comprovação de Pagamento | Inserção dos dados financeiros do pagamento (DAR, Comprovante e Capa), com tentativa de auto-preenchimento de valor/data do comprovante e revisão pelo operador, para alteração de status do processo para PAGO. |
 | **UC06** | `FATURAMENTO` | Registrar Emissão de Nota de Débito | Cadastro de dados e anexo da Nota de Débito emitida para ressarcimento financeiro do cliente. |
 | **UC07** | `DESCARGA` | Registrar Encerramento Sem Auto | Liberação do processo sem multa, aplicando o cálculo projetado e inserção de justificativa obrigatória. |
 | **UC08** | `GESTAO` | Analisar Dashboard e Exportar Dados | Acesso visual aos gráficos de KPIs gerenciais de desempenho financeiro e exportação de relatórios dinâmicos Excel (.xlsx). |
