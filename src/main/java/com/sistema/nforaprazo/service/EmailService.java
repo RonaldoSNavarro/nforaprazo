@@ -202,7 +202,7 @@ public class EmailService {
                 
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(emailRemetente);
+            message.setFrom(getRemetenteValido());
             message.setTo(emailDestino);
             message.setSubject(assunto);
             message.setText(texto);
@@ -228,7 +228,7 @@ public class EmailService {
                 .build();
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(emailRemetente);
+            message.setFrom(getRemetenteValido());
             message.setTo(destinatario);
             message.setSubject(assunto);
             message.setText(texto);
@@ -242,5 +242,12 @@ public class EmailService {
         } finally {
             logAlertaRepository.save(logAlerta);
         }
+    }
+
+    private String getRemetenteValido() {
+        if (emailRemetente != null && !emailRemetente.trim().isEmpty()) {
+            return emailRemetente.trim();
+        }
+        return "noreply@sistema.local";
     }
 }
