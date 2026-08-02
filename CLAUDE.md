@@ -1,12 +1,12 @@
 # CLAUDE.md - NforaPrazo
 
-O **NforaPrazo** é um projeto Java 21 com Spring Boot para gerenciamento e notificação de notas fiscais emitidas fora do prazo legal.
+O **NforaPrazo** é um projeto Java 25 LTS com Spring Boot 4.1.0 para gerenciamento e notificação de notas fiscais emitidas fora do prazo legal.
 
 ---
 
 ## 🛠️ Comandos de Desenvolvimento
 
-### Build e Testes (Maven / Java 21)
+### Build e Testes (Maven / Java 25)
 ```bash
 # Compilar o projeto e gerar o JAR
 mvn clean package -DskipTests
@@ -31,5 +31,5 @@ docker-compose up -d --build
 Este projeto utiliza o **Cortex** como servidor de memória ativa. As ferramentas MCP (`query`, `capture`, `write_page`, `promote_rules`) estão conectadas via SSE em `http://localhost:8080/mcp/sse`.
 
 ## 📜 Diretrizes de Código
-- Java 21, Spring Boot, Spring Data JPA, Lombok.
+- Java 25 LTS, Spring Boot 4.1.0, Spring Data JPA, Lombok.
 - Manter o Jackson configurado com `FAIL_ON_UNKNOWN_PROPERTIES = false` para requisições de IA.

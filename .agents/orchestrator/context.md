@@ -17,4 +17,4 @@ This file tracks the active context, technology definitions, and configuration s
 ## Code & Environment Constraints
 - NO modifications to code in `src/`.
 - NO Git commits without explicit permission.
-- The project runs on Java 21 + Spring Boot 3.x + Thymeleaf + PostgreSQL 16.
+- The project runs on Java 25 LTS + Spring Boot 4.1.0 + Thymeleaf + PostgreSQL 16.

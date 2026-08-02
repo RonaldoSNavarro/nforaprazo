@@ -14,7 +14,7 @@
 | RF05  | Auto Infração  | Alta       | Upload do PDF do auto de infração vinculado ao CT-e com data emissão e vencimento |
 | RF06  | Auto Infração  | Alta       | Alerta automático ao DOCS_FISCAL após registro do auto |
 | RF07  | Investigação   | Alta       | Campos para DOCS_FISCAL: responsável (SISTEMA/CLIENTE), motivo, ticket/evidência — BLOQUEANTE para avançar |
-| RF08  | Pagamento      | Alta       | Upload de DAR + comprovante + capa; registro do valor efetivamente pago |
+| RF08  | Pagamento      | Alta       | Upload de DAR + comprovante + capa; registro do valor efetivamente pago, com tentativa de auto-preenchimento de valor e data ao selecionar o comprovante |
 | RF09  | Pagamento      | Alta       | Alerta ao FATURAMENTO após pagamento confirmado |
 | RF10  | Encerramento   | Alta       | FATURAMENTO registra nota de débito → status ENCERRADO_COM_AUTO |
 | RF11  | Encerramento   | Alta       | Fluxo "sem auto": calcula 10% das NFs, exige justificativa, → ENCERRADO_SEM_AUTO |

@@ -1,5 +1,6 @@
 package com.sistema.nforaprazo.service;
 
+import com.sistema.nforaprazo.dto.ComprovantePagamentoExtractionResultDto;
 import com.sistema.nforaprazo.dto.CteExtractionResultDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
@@ -10,14 +11,24 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
 public class PdfExtractionService {
+
+    private static final Pattern VALOR_PAGO_COMPROVANTE_PATTERN = Pattern.compile(
+            "(?i)(?:valor\\s+(?:pago|do\\s+pagamento|da\\s+transa\\p{L}*o)|total\\s+pago)\\s*[:\\-]?\\s*(?:R\\$\\s*)?([\\d]{1,3}(?:\\.[\\d]{3})*,[\\d]{2})");
+    private static final Pattern DATA_PAGAMENTO_COMPROVANTE_PATTERN = Pattern.compile(
+            "(?i)data\\s+(?:do|de)\\s+pagamento\\s*[:\\-]?\\s*(\\d{2}[/-]\\d{2}[/-]\\d{4})");
+    private static final DateTimeFormatter DATA_BRASILEIRA = DateTimeFormatter.ofPattern("dd/MM/uuuu");
 
     private static final Pattern CHAVE_SPACED_PATTERN = Pattern.compile("\\b(?:\\d{4}[\\s\\-]*){11}\\b");
     private static final Pattern CHAVE_DIGITOS_PATTERN = Pattern.compile("\\b\\d{44}\\b");
@@ -261,6 +272,46 @@ public class PdfExtractionService {
             log.error("Erro ao ler PDF do DAR para extracao de valor: {}", e.getMessage(), e);
         }
         return null;
+    }
+
+    public ComprovantePagamentoExtractionResultDto extrairDadosComprovante(MultipartFile comprovantePdf) {
+        if (comprovantePdf == null || comprovantePdf.isEmpty()) {
+            throw new IllegalArgumentException("O comprovante de pagamento deve ser informado.");
+        }
+
+        try (PDDocument document = Loader.loadPDF(comprovantePdf.getBytes())) {
+            if (document.isEncrypted()) {
+                throw new IllegalArgumentException("O comprovante de pagamento esta criptografado.");
+            }
+
+            String texto = new PDFTextStripper().getText(document);
+            BigDecimal valorPago = extrairValorPagoComprovante(texto);
+            LocalDate dataPagamento = extrairDataPagamentoComprovante(texto);
+            log.info("Extracao do comprovante concluida. Valor encontrado: {}, data encontrada: {}",
+                    valorPago != null, dataPagamento != null);
+            return new ComprovantePagamentoExtractionResultDto(valorPago, dataPagamento);
+        } catch (IOException e) {
+            log.warn("Nao foi possivel ler o comprovante de pagamento: {}", e.getMessage());
+            throw new IllegalArgumentException("Nao foi possivel ler o comprovante de pagamento.");
+        }
+    }
+
+    private BigDecimal extrairValorPagoComprovante(String texto) {
+        Matcher matcher = VALOR_PAGO_COMPROVANTE_PATTERN.matcher(texto);
+        return matcher.find() ? converterValor(matcher.group(1)) : null;
+    }
+
+    private LocalDate extrairDataPagamentoComprovante(String texto) {
+        Matcher matcher = DATA_PAGAMENTO_COMPROVANTE_PATTERN.matcher(texto);
+        if (!matcher.find()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(matcher.group(1).replace('-', '/'), DATA_BRASILEIRA);
+        } catch (DateTimeParseException e) {
+            log.warn("Data de pagamento invalida no comprovante: {}", matcher.group(1));
+            return null;
+        }
     }
 
     private String extrairChaveTexto(String text) {

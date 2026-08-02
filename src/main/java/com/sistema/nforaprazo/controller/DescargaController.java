@@ -5,18 +5,22 @@ import com.sistema.nforaprazo.model.Cte;
 import com.sistema.nforaprazo.model.enums.StatusCte;
 import com.sistema.nforaprazo.repository.CteRepository;
 import com.sistema.nforaprazo.service.DescargaService;
+import com.sistema.nforaprazo.service.PdfExtractionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +33,7 @@ public class DescargaController {
 
     private final CteRepository cteRepository;
     private final DescargaService descargaService;
+    private final PdfExtractionService pdfExtractionService;
 
     @GetMapping("/pendentes")
     public String listarPendentes(@RequestParam(defaultValue = "0") int page, Model model) {
@@ -127,6 +132,17 @@ public class DescargaController {
             redirectAttributes.addFlashAttribute("erro", "Erro: " + e.getMessage());
         }
         return "redirect:/descarga/pendentes";
+    }
+
+    @PostMapping(value = "/extrair-comprovante", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public ResponseEntity<ComprovantePagamentoExtractionResultDto> extrairDadosComprovante(
+            @RequestParam("comprovantePdf") MultipartFile comprovantePdf) {
+        try {
+            return ResponseEntity.ok(pdfExtractionService.extrairDadosComprovante(comprovantePdf));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/encerrar-sem-auto")

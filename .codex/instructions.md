@@ -1,7 +1,7 @@
 # OpenAI Codex Instructions for NforaPrazo
 
 ## Overview
-NforaPrazo is a Java 21 Spring Boot application.
+NforaPrazo is a Java 25 LTS Spring Boot 4.1.0 application.
 
 ## Build Commands
 - `mvn clean package -DskipTests`

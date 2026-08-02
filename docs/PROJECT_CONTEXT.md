@@ -9,13 +9,13 @@
 ## 1. STACK TÉCNICA (DEFINITIVA — não alterar sem ADR)
  
 ```
-Backend:    Java 21 + Spring Boot 3.x + Maven
+Backend:    Java 25 LTS + Spring Boot 4.1.0 + Maven
 Frontend:   Thymeleaf + Tailwind CSS (CDN) + Chart.js (CDN)
 Banco:      PostgreSQL 16
 Migrations: Flyway (imutáveis após aplicadas)
 Segurança:  Spring Security (BCrypt, perfis por URL)
 E-mail:     Spring Mail / JavaMailSender
-PDF read:   Apache PDFBox 3.x
+PDF read:   Apache PDFBox 3.x (CT-e, DAR e comprovante de pagamento)
 Export:     Apache POI (Excel)
 Deploy:     VPS Ubuntu 24 + Docker + Nginx (produção)
 ```
